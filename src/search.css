@@ -1,0 +1,71 @@
+body>div {
+  width: 800px;
+  margin: 20px auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  font-size: 16px;
+  padding: 10px;
+}
+
+div#search-result-container {
+  padding: 20px 10px;
+  font-size: 13px;
+}
+
+div#search-result-container a {
+  font-size: 16px;
+}
+
+div#search-result-container span {
+  color: #006621;
+  line-height: 1.5;
+}
+
+div#search-result-container p {
+  margin-block-start: 2px;
+  line-height: 1.3;
+}
+
+body {
+  overflow-y: scroll;
+}
+
+a.disabled {
+  pointer-events: none;
+  cursor: default;
+  text-decoration: none;
+  color: gray;
+}
+
+div#search-result-container span.sim {
+  font-style: italic;
+  padding-left: 10px;
+  color: gray
+}
+
+div.loading {
+  width: 24px;
+  height: 24px;
+  border: 5px solid rgba(0, 0, 0, 0);
+  border-bottom-color: #138a07;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
