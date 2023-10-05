@@ -34,22 +34,22 @@ import "./popup.css";
         (document.getElementById(CONFIG_DISABLE_COMPLETION)! as HTMLInputElement).checked = disableCompletion;
 
         const maxTokenInput = document.getElementById(CONFIG_MAX_TOKEN) as HTMLInputElement;
-        maxTokenInput.value = result[CONFIG_MAX_TOKEN];
+        maxTokenInput.value = result[CONFIG_MAX_TOKEN] ?? "";
         maxTokenInput.disabled = disableCompletion;
 
         const maxPromptWordsInput = document.getElementById(CONFIG_MAX_PROMPT_WORDS) as HTMLInputElement
-        maxPromptWordsInput.value = result[CONFIG_MAX_PROMPT_WORDS];;
+        maxPromptWordsInput.value = result[CONFIG_MAX_PROMPT_WORDS] ?? "";
         maxPromptWordsInput.disabled = disableCompletion;
 
         const completionCustomPromptInput = document.getElementById(CONFIG_COMPLETION_CUSTOM_PROMPT)! as HTMLInputElement;
-        completionCustomPromptInput.value = result[CONFIG_COMPLETION_CUSTOM_PROMPT];
+        completionCustomPromptInput.value = result[CONFIG_COMPLETION_CUSTOM_PROMPT] ?? "";
         completionCustomPromptInput.disabled = disableCompletion;
 
         const disableImprovement = !!result[CONFIG_DISABLE_IMPROVEMENT];
         (document.getElementById(CONFIG_DISABLE_IMPROVEMENT)! as HTMLInputElement).checked = disableImprovement;
 
         const improvementCustomPromptInput = document.getElementById(CONFIG_IMPROVEMENT_CUSTOM_PROMPT) as HTMLInputElement;
-        improvementCustomPromptInput.value = result[CONFIG_IMPROVEMENT_CUSTOM_PROMPT];
+        improvementCustomPromptInput.value = result[CONFIG_IMPROVEMENT_CUSTOM_PROMPT] ?? "";
         improvementCustomPromptInput.disabled = disableImprovement;
       });
   }

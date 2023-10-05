@@ -59,7 +59,10 @@ async function getCompletion(input: string, signal: AbortSignal) {
 
 function buildCompletionPrompt(input: string, template: string) {
   if (!!template) {
-    return template.replace("<input>", input);
+    if (template.indexOf("<input>") >= 0)
+      return template.replace("<input>", input);
+    else
+      return template + input;
   }
 
   return `Continue ${input.endsWith("\n") ? "" : "the last paragraph of "}the academic paper in LaTeX below, ` +

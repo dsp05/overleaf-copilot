@@ -30,7 +30,10 @@ export async function GetImprovement(selection: string) {
 
 function buildImprovePrompt(selection: string, template: string) {
   if (!!template) {
-    return template.replace("<input>", selection);
+    if (template.indexOf("<input>") >= 0)
+      return template.replace("<input>", selection);
+    else
+      return template + selection;
   }
 
   return `Rewrite and improve the following content:\n` +
