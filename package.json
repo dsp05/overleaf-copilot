@@ -1,6 +1,6 @@
 {
   "name": "overleaf-copilot",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Copilot for Overleaf",
   "private": true,
   "scripts": {
