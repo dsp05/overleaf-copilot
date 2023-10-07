@@ -2,6 +2,8 @@
 
 A Copilot browser extension for the Overleaf website.
 
+[Chrome extension](https://chrome.google.com/webstore/detail/overleaf-copilot/pcmffklbilmgckfkbncpoffmicdpfkmm)
+
 ## Features
 
 - Auto-Completion
