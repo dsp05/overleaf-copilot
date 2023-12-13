@@ -1,6 +1,7 @@
 "use strict";
 
 export const CONFIG_API_KEY = "config-api-key";
+export const CONFIG_BASE_URL = "config-base-url";
 export const CONFIG_MODEL = "config-model";
 export const CONFIG_MAX_TOKEN = "config-max-token";
 export const CONFIG_COMPLETION_CUSTOM_PROMPT = "config-completion-custom-prompt";

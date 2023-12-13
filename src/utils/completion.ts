@@ -4,7 +4,7 @@ import OpenAI, { APIUserAbortError } from "openai";
 import crypto from "crypto-js";
 import { ChatCompletion } from "openai/resources/chat";
 import {
-  CONFIG_API_KEY, CONFIG_COMPLETION_CUSTOM_PROMPT,
+  CONFIG_API_KEY, CONFIG_BASE_URL, CONFIG_COMPLETION_CUSTOM_PROMPT,
   CONFIG_MAX_TOKEN, CONFIG_MODEL, DEFAULT_MAX_TOKEN, DEFAULT_MODEL
 } from "../constants";
 
@@ -27,14 +27,18 @@ export async function GetOrLoadCompletion(input: string, signal: AbortSignal) {
 async function getCompletion(input: string, signal: AbortSignal) {
   const config = await chrome.storage.local.get([
     CONFIG_API_KEY,
+    CONFIG_BASE_URL,
     CONFIG_MODEL,
     CONFIG_MAX_TOKEN,
     CONFIG_COMPLETION_CUSTOM_PROMPT]);
 
   if (!config[CONFIG_API_KEY]) return "";
 
+  console.log("config", config)
+
   const openai = new OpenAI({
     apiKey: config[CONFIG_API_KEY],
+    baseURL: !!config[CONFIG_BASE_URL]? config[CONFIG_BASE_URL] : undefined,
     dangerouslyAllowBrowser: true,
   });
 

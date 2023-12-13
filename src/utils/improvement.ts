@@ -2,18 +2,19 @@
 
 import OpenAI from "openai";
 import {
-  CONFIG_API_KEY, CONFIG_IMPROVEMENT_CUSTOM_PROMPT,
+  CONFIG_API_KEY, CONFIG_BASE_URL, CONFIG_IMPROVEMENT_CUSTOM_PROMPT,
   CONFIG_MODEL, DEFAULT_MODEL
 } from "../constants";
 
 export async function GetImprovement(selection: string) {
   const config = await chrome.storage.local.get([
-    CONFIG_API_KEY, CONFIG_MODEL, CONFIG_IMPROVEMENT_CUSTOM_PROMPT]);
+    CONFIG_API_KEY, CONFIG_BASE_URL, CONFIG_MODEL, CONFIG_IMPROVEMENT_CUSTOM_PROMPT]);
 
   if (!config[CONFIG_API_KEY]) return "";
 
   const openai = new OpenAI({
     apiKey: config[CONFIG_API_KEY],
+    baseURL: !!config[CONFIG_BASE_URL]? config[CONFIG_BASE_URL] : undefined,
     dangerouslyAllowBrowser: true,
   });
 

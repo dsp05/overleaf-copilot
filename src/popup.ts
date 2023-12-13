@@ -1,7 +1,7 @@
 "use strict";
 
 import {
-  CONFIG_API_KEY, CONFIG_COMPLETION_CUSTOM_PROMPT, CONFIG_DISABLE_COMPLETION,
+  CONFIG_API_KEY, CONFIG_BASE_URL, CONFIG_COMPLETION_CUSTOM_PROMPT, CONFIG_DISABLE_COMPLETION,
   CONFIG_DISABLE_IMPROVEMENT, CONFIG_IMPROVEMENT_CUSTOM_PROMPT,
   CONFIG_MAX_PROMPT_WORDS, CONFIG_MAX_TOKEN, CONFIG_MODEL
 } from "./constants";
@@ -10,7 +10,7 @@ import "./popup.css";
 (function () {
   function restoreConfig() {
     chrome.storage.local.get([
-      CONFIG_API_KEY, CONFIG_MODEL, CONFIG_MAX_TOKEN,
+      CONFIG_API_KEY, CONFIG_BASE_URL, CONFIG_MODEL, CONFIG_MAX_TOKEN,
       CONFIG_MAX_PROMPT_WORDS, CONFIG_COMPLETION_CUSTOM_PROMPT, CONFIG_IMPROVEMENT_CUSTOM_PROMPT,
       CONFIG_DISABLE_COMPLETION, CONFIG_DISABLE_IMPROVEMENT],
       (result) => {
@@ -18,6 +18,11 @@ import "./popup.css";
         if (!!apiKey) {
           const maskedApiKey = apiKey.length <= 3 ? "***" : apiKey.substring(0, 3) + "*".repeat(apiKey.length - 3);
           document.getElementById(CONFIG_API_KEY)!.setAttribute("placeholder", maskedApiKey);
+        }
+
+        const baseURL = result[CONFIG_BASE_URL] as string;
+        if (!!baseURL) {
+          document.getElementById(CONFIG_BASE_URL)!.setAttribute("placeholder", baseURL);
         }
 
         const selected = result[CONFIG_MODEL];
@@ -57,6 +62,7 @@ import "./popup.css";
   document.getElementById("btn-save")!.addEventListener("click", async () => {
     const model = (document.getElementById(CONFIG_MODEL)! as HTMLSelectElement).value;
     const apiKey = (document.getElementById(CONFIG_API_KEY)! as HTMLInputElement).value;
+    const baseURL = (document.getElementById(CONFIG_BASE_URL)! as HTMLInputElement).value;
     const maxToken = (document.getElementById(CONFIG_MAX_TOKEN)! as HTMLInputElement).value;
     const maxPromptWords = (document.getElementById(CONFIG_MAX_PROMPT_WORDS)! as HTMLInputElement).value;
     const completionCustomPrompt = (document.getElementById(CONFIG_COMPLETION_CUSTOM_PROMPT)! as HTMLInputElement).value;
@@ -75,11 +81,12 @@ import "./popup.css";
     };
 
     if (!!apiKey) config[CONFIG_API_KEY] = apiKey;
+    if (!!baseURL) config[CONFIG_BASE_URL] = baseURL;
     await chrome.storage.local.set(config);
     const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
     if (tabs?.length > 0 && tabs[0].id) {
       try {
-        await chrome.tabs.sendMessage(tabs[0].id, { type: "config:update" });
+        chrome.tabs.sendMessage(tabs[0].id, { type: "config:update" });
       } catch (err) {
         console.error(err);
       }
