@@ -1,97 +1,97 @@
 div#copilot-suggestion-content {
-    white-space: break-spaces;
-    position: absolute;
-    color: #777;
-    font-style: italic;
-    z-index: 1;
-    font-size: 12px;
-    line-height: 20px;
-    left: 54px;
+  white-space: break-spaces;
+  position: absolute;
+  color: #777;
+  font-style: italic;
+  z-index: 1;
+  font-size: 12px;
+  line-height: 20px;
+  left: 54px;
 }
 
 div#copilot-suggestion-content div#copilot-suggestion-background {
-    position: absolute;
-    left: -5px;
-    right: 0px;
-    top: 19px;
-    bottom: 1px;
-    background-color: rgb(240, 240, 240);
-    z-index: -1;
+  position: absolute;
+  left: -5px;
+  right: 0px;
+  top: 19px;
+  bottom: 1px;
+  background-color: rgb(240, 240, 240);
+  z-index: -1;
 }
 
 div#copilot-side-panel {
-    font-size: 14px;
-    z-index: 100;
-    width: 400px;
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    padding: 10px 20px;
-    background: #fafafa;
-    overflow-y: scroll;
+  font-size: 14px;
+  z-index: 100;
+  width: 400px;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  padding: 10px 20px;
+  background: #fafafa;
+  overflow-y: scroll;
 }
 
 p#copilot-original-content {
-    white-space: break-spaces;
-    overflow-y: auto;
-    max-height: 160px;
-    padding: 5px 10px;
-    border: solid 1px;
-    border-radius: 2px;
+  white-space: break-spaces;
+  overflow-y: auto;
+  max-height: 160px;
+  padding: 5px 10px;
+  border: solid 1px;
+  border-radius: 2px;
 }
 
 textarea#copilot-gpt-response {
-    resize: none;
-    width: 100%;
-    padding: 5px 10px;
+  resize: none;
+  width: 100%;
+  padding: 5px 10px;
 }
 
 button#btn-copilot-close {
-    float: right;
-    margin-top: 7px;
-    font-size: 14px;
+  float: right;
+  margin-top: 7px;
+  font-size: 14px;
 }
 
 button#btn-copilot-load-more {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 div#copilot-similar-content-container {
-    display: none;
+  display: none;
 }
 
 div#copilot-similar-content-loading-spinner {
-    text-align: center;
+  text-align: center;
 }
 
 div#copilot-sidebar-button {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background-size: cover;
-    cursor: pointer;
-    z-index: 1000;
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-size: cover;
+  cursor: pointer;
+  z-index: 1000;
 }
 
 div.loading {
-    width: 24px;
-    height: 24px;
-    border: 5px solid rgba(0, 0, 0, 0);
-    border-bottom-color: #138a07;
-    border-radius: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
+  width: 24px;
+  height: 24px;
+  border: 5px solid rgba(0, 0, 0, 0);
+  border-bottom-color: #138a07;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
 }
 
 @keyframes rotation {
-    0% {
-        transform: rotate(0deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
 
-    100% {
-        transform: rotate(360deg);
-    }
+  100% {
+    transform: rotate(360deg);
+  }
 }

@@ -115,7 +115,7 @@ code {
   margin-bottom: 10px;
 }
 
-.row input[type=checkbox] {
+.row input[type='checkbox'] {
   height: 1em;
   line-height: 1em;
   margin-top: 0.5em;
