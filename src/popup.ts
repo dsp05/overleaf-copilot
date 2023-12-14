@@ -152,7 +152,7 @@ import './popup.css';
     });
     if (tabs?.length > 0 && tabs[0].id) {
       try {
-        chrome.tabs.sendMessage(tabs[0].id, { type: 'config:update' });
+        await chrome.tabs.sendMessage(tabs[0].id, { type: 'config:update' });
       } catch (err) {
         console.error(err);
       }

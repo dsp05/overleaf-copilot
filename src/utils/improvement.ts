@@ -21,7 +21,7 @@ export async function GetImprovement(selection: string) {
 
   const openai = new OpenAI({
     apiKey: config[CONFIG_API_KEY],
-    baseURL: !!config[CONFIG_BASE_URL] ? config[CONFIG_BASE_URL] : undefined,
+    baseURL: config[CONFIG_BASE_URL] || undefined,
     dangerouslyAllowBrowser: true,
   });
 
