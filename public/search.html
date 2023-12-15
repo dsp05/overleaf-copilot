@@ -1,44 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Search related content on arXiv</title>
+    <link rel="stylesheet" href="search.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Search related content on arXiv</title>
-  <link rel="stylesheet" href="search.css" />
-</head>
-
-<body>
-  <script src="search.js"></script>
-  <div>
-    <h1>Search related content on arXiv</h1>
-    <input type="text" name="selection" id="selection" placeholder="Search in arXiv..." />
-    <div id="search-result-container">
-    </div>
-  </div>
-
-  <template id="search-result">
+  <body>
+    <script src="search.js"></script>
     <div>
-      <a target="_blank"></a>
+      <h1>Search related content on arXiv</h1>
+      <input
+        type="text"
+        name="selection"
+        id="selection"
+        placeholder="Search in arXiv..."
+      />
+      <div id="search-result-container"></div>
+    </div>
+
+    <template id="search-result">
       <div>
-        <span></span>
+        <a target="_blank"></a>
+        <div>
+          <span></span>
+        </div>
+        <div class="text"></div>
       </div>
-      <div class="text"></div>
-    </div>
-  </template>
+    </template>
 
-  <template id="loading">
-    <div style="margin-top: 20px; text-align: center;">
-      <div class="loading"></div>
-    </div>
-  </template>
+    <template id="loading">
+      <div style="margin-top: 20px; text-align: center">
+        <div class="loading"></div>
+      </div>
+    </template>
 
-  <template id="pagination">
-    <div style="margin-top: 20px; text-align: center; font-size: 16px;">
-      <a href="#">Prev</a>
-      <span style="padding: 0 20px; color: gray;"></span>
-      <a href="#">Next</a>
-    </div>
-  </template>
-</body>
-
+    <template id="pagination">
+      <div style="margin-top: 20px; text-align: center; font-size: 16px">
+        <a href="#">Prev</a>
+        <span style="padding: 0 20px; color: gray"></span>
+        <a href="#">Next</a>
+      </div>
+    </template>
+  </body>
 </html>
