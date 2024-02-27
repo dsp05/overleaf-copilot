@@ -134,6 +134,17 @@ window.addEventListener(
   'copilot:config:update',
   onConfigUpdate as EventListener
 );
-document
-  .querySelector('.cm-content')
-  ?.addEventListener('keydown', onKeyDown as EventListener);
+
+// REVIEW dsp05: This isn't very ideal, need to investigate what was changed.
+const setupKeydownListener = (n: number) => {
+  if (n <= 0) return true;
+  const editor = document.querySelector('.cm-content');
+  if (!editor) {
+    setTimeout(() => setupKeydownListener(n - 1), 500);
+    return false;
+  }
+  editor.addEventListener('keydown', onKeyDown as EventListener);
+  return true;
+};
+
+setupKeydownListener(10);

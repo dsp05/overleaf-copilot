@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Overleaf Copilot",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Copilot for Overleaf",
   "icons": {
     "16": "icons/icon_16.png",
@@ -11,8 +11,14 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["icons/icon_128.png", "sidePanel.html", "search.html"],
-      "matches": ["https://www.overleaf.com/*"]
+      "resources": [
+        "icons/icon_128.png",
+        "sidePanel.html",
+        "search.html"
+      ],
+      "matches": [
+        "https://www.overleaf.com/*"
+      ]
     }
   ],
   "background": {
@@ -22,19 +28,31 @@
     "default_title": "Overleaf Copilot",
     "default_popup": "popup.html"
   },
-  "permissions": ["storage"],
+  "permissions": [
+    "storage"
+  ],
   "content_scripts": [
     {
       "world": "MAIN",
-      "matches": ["https://www.overleaf.com/project/*"],
+      "matches": [
+        "https://www.overleaf.com/project/*"
+      ],
       "run_at": "document_idle",
-      "js": ["contentMainScript.js"]
+      "js": [
+        "contentMainScript.js"
+      ]
     },
     {
-      "matches": ["https://www.overleaf.com/project/*"],
+      "matches": [
+        "https://www.overleaf.com/project/*"
+      ],
       "run_at": "document_idle",
-      "js": ["contentIsoScript.js"],
-      "css": ["contentIsoScript.css"]
+      "js": [
+        "contentIsoScript.js"
+      ],
+      "css": [
+        "contentIsoScript.css"
+      ]
     }
   ]
 }

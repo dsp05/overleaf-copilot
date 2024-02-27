@@ -9,7 +9,7 @@ export async function LoadSidePanel(
   to: number
 ) {
   const rightContainer = document.querySelector(
-    '.ui-layout-east'
+    '.ide-react-panel[data-panel-id="panel-pdf"]'
   ) as HTMLElement;
   if (!rightContainer) return;
 
