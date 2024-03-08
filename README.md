@@ -10,6 +10,7 @@ A Copilot browser extension for the Overleaf website.
 - Auto-Completion
 - Text Enhancement with GPT
 - Discover Related Content on arXiv
+- Ask specific questions to GPT
 
 
 ---

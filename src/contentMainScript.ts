@@ -12,6 +12,7 @@ function debounce<T extends () => void>(func: T): () => void {
     document.getElementById('copilot-sidebar-button')?.remove();
     document.getElementById('copilot-suggestion')?.remove();
     document.getElementById('copilot-side-panel')?.remove();
+    document.getElementById('copilot-chat-panel')?.remove();
 
     if (timeout) clearTimeout(timeout);
 
@@ -104,6 +105,17 @@ function onConfigUpdate(e: CustomEvent<{ [CONFIG_MAX_PROMPT_WORDS]: number }>) {
   maxPromptWords = e.detail[CONFIG_MAX_PROMPT_WORDS] || maxPromptWords;
 }
 
+function onEditorAppend(
+  e: CustomEvent<{ content: string }>
+) {
+  var editor = document.querySelector('.cm-content');
+  if (!editor) return;
+  const content = editor as any as EditorContent;
+  const currentPos = content.cmView.view.state.selection.main.head;
+  const changes = { from: currentPos, to: currentPos, insert: e.detail.content };
+  content.cmView.view.dispatch({ changes });
+}
+
 function onAcceptImprovement(
   e: CustomEvent<{ improvement: string; from: number; to: number }>
 ) {
@@ -130,6 +142,7 @@ window.addEventListener(
   onAcceptImprovement as EventListener
 );
 window.addEventListener('cursor:editor:update', debounce(onCursorUpdate));
+window.addEventListener('copilot:editor:append', onEditorAppend as EventListener);
 window.addEventListener(
   'copilot:config:update',
   onConfigUpdate as EventListener
