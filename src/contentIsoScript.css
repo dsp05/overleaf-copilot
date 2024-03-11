@@ -41,11 +41,12 @@ p#copilot-original-content {
   border-radius: 2px;
 }
 
-textarea#copilot-gpt-response {
+textarea#copilot-gpt-response, textarea#copilot-gpt-question {
   resize: none;
   width: 100%;
   padding: 5px 10px;
 }
+
 
 button#btn-copilot-close {
   float: right;

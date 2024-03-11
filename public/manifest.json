@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Overleaf Copilot",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Copilot for Overleaf",
   "icons": {
     "16": "icons/icon_16.png",
@@ -14,6 +14,7 @@
       "resources": [
         "icons/icon_128.png",
         "sidePanel.html",
+        "chatPanel.html",
         "search.html"
       ],
       "matches": [
@@ -29,7 +30,9 @@
     "default_popup": "popup.html"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "scripting",
+    "activeTab"
   ],
   "content_scripts": [
     {
@@ -54,5 +57,14 @@
         "contentIsoScript.css"
       ]
     }
-  ]
+  ],
+  "commands": {
+    "chat": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+I",
+        "mac": "Command+Shift+I"
+      },
+      "description": "Prompt user to chat with Copilot"
+    }
+  }
 }

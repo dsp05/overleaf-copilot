@@ -9,8 +9,14 @@ import {
   CONFIG_DISABLE_IMPROVEMENT,
   CONFIG_MAX_PROMPT_WORDS,
 } from './constants';
+import { LoadChatPanel } from './chatPanel';
 
 let cursorPos: { row: number; column: number } | null = null;
+let currentSelection: {
+  selection?: string;
+  from?: number;
+  to?: number;
+} = {};
 
 function debounce<
   T extends (
@@ -52,6 +58,9 @@ async function onEditorUpdate(
   col: number,
   signal: AbortSignal
 ) {
+  // Delete selection
+  currentSelection = {};
+  
   const config = await chrome.storage.local.get([CONFIG_DISABLE_COMPLETION]);
   if (!!config[CONFIG_DISABLE_COMPLETION]) return;
 
@@ -110,6 +119,9 @@ async function onEditorSelect(
     head: number;
   }>
 ) {
+  // Save current selection
+  currentSelection = event.detail;
+  
   const config = await chrome.storage.local.get([CONFIG_DISABLE_IMPROVEMENT]);
 
   if (!!config[CONFIG_DISABLE_IMPROVEMENT]) return;
@@ -165,4 +177,11 @@ window.addEventListener('load', onConfigUpdate);
 
 chrome.runtime.onMessage.addListener(async function (request) {
   if (request.type === 'config:update') await onConfigUpdate();
+  if (request.type === 'chat:open') { 
+
+    await LoadChatPanel(
+      currentSelection.selection,
+      currentSelection.from,
+      currentSelection.to)
+  };
 });
