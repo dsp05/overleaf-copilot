@@ -1,104 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Overleaf Copilot</title>
-    <link rel="stylesheet" href="popup.css" />
-  </head>
 
-  <body>
-    <div class="app">
-      <p class="title">Model Settings</p>
-      <div class="row">
-        <label for="config-api-key">OpenAI API Key</label>
-        <input
-          type="password"
-          id="config-api-key"
-          name="config-api-key"
-          placeholder="Enter your key here..."
-        />
-      </div>
-      <div class="row">
-        <label for="config-base-url">API Base URL</label>
-        <input
-          type="text"
-          id="config-base-url"
-          name="config-base-url"
-          placeholder="https://api.openai.com/v1"
-        />
-      </div>
-      <div class="row">
-        <label for="name">Model</label>
-        <select id="config-model" name="config-model">
-          <option value="" disabled selected>Select a model</option>
-          <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-          <option value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k</option>
-          <option value="gpt-4">gpt-4</option>
-          <option value="gpt-4-32k">gpt-4-32k</option>
-        </select>
-      </div>
-      <div class="divider"></div>
-      <p class="title">Completion Settings</p>
-      <div class="row">
-        <label for="name">Max prompt words</label>
-        <input
-          type="number"
-          id="config-max-prompt-words"
-          name="config-max-prompt-words"
-          placeholder="Default is 500"
-        />
-      </div>
-      <div class="row">
-        <label for="name">Max completion token</label>
-        <input
-          type="number"
-          id="config-max-token"
-          name="config-max-token"
-          placeholder="Default is 100"
-        />
-      </div>
-      <div class="row">
-        <label for="name">Custom prompt</label>
-        <textarea
-          id="config-completion-custom-prompt"
-          name="config-completion-custom-prompt"
-          rows="7"
-          placeholder="Continue the academic paper in LaTeX below, making sure to maintain semantic continuity.&#10;&#10;### Beginning of the paper ###&#10;<input>&#10;### End of the paper ###"
-        ></textarea>
-      </div>
-      <div class="row">
-        <label for="name">Disable</label>
-        <input
-          type="checkbox"
-          id="config-disable-completion"
-          name="config-disable-completion"
-        />
-      </div>
-      <div class="divider"></div>
-      <p class="title">Improvement Settings</p>
-      <div class="row">
-        <label for="name">Custom prompt</label>
-        <textarea
-          id="config-improvement-custom-prompt"
-          name="config-improvement-custom-prompt"
-          rows="3"
-          placeholder="Rewrite and improve the following content:&#10;<input>&#10;"
-        ></textarea>
-      </div>
-      <div class="row">
-        <label for="name">Disable</label>
-        <input
-          type="checkbox"
-          id="config-disable-improvement"
-          name="config-disable-improvement"
-        />
-      </div>
-      <div class="button-container">
-        <button id="btn-save" class="button">Save</button>
-        <button id="btn-cancel" class="button">Cancel</button>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Overleaf Copilot</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+
+<body>
+  <div class="app">
+    <p class="title">Model Settings</p>
+    <div class="row">
+      <label for="config-api-key">OpenAI API Key</label>
+      <input type="password" id="config-api-key" name="config-api-key" placeholder="Enter your key here..." />
     </div>
+    <div class="row">
+      <label for="config-base-url">API Base URL</label>
+      <input type="text" id="config-base-url" name="config-base-url" placeholder="https://api.openai.com/v1" />
+    </div>
+    <div class="row">
+      <label for="name">Model</label>
+      <select id="config-model" name="config-model">
+        <option value="" disabled selected>Select a model</option>
+        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+        <option value="gpt-4">gpt-4</option>
+        <option value="gpt-4-turbo">gpt-4-turbo</option>
+        <option value="gpt-4o">gpt-4o</option>
+        <option value="gpt-4o-mini">gpt-4o-mini</option>
+      </select>
+    </div>
+    <div class="divider"></div>
+    <p class="title">Completion Settings</p>
+    <div class="row">
+      <label for="name">Max prompt words</label>
+      <input type="number" id="config-max-prompt-words" name="config-max-prompt-words" placeholder="Default is 500" />
+    </div>
+    <div class="row">
+      <label for="name">Max completion token</label>
+      <input type="number" id="config-max-token" name="config-max-token" placeholder="Default is 100" />
+    </div>
+    <div class="row">
+      <label for="name">Custom prompt</label>
+      <textarea id="config-completion-custom-prompt" name="config-completion-custom-prompt" rows="7"
+        placeholder="Continue the academic paper in LaTeX below, making sure to maintain semantic continuity.&#10;&#10;### Beginning of the paper ###&#10;<input>&#10;### End of the paper ###"></textarea>
+    </div>
+    <div class="row">
+      <label for="name">Disable</label>
+      <input type="checkbox" id="config-disable-completion" name="config-disable-completion" />
+    </div>
+    <div class="divider"></div>
+    <p class="title">Improvement Settings</p>
+    <div class="row">
+      <label for="name">Custom prompt</label>
+      <textarea id="config-improvement-custom-prompt" name="config-improvement-custom-prompt" rows="3"
+        placeholder="Rewrite and improve the following content:&#10;<input>&#10;"></textarea>
+    </div>
+    <div class="row">
+      <label for="name">Disable</label>
+      <input type="checkbox" id="config-disable-improvement" name="config-disable-improvement" />
+    </div>
+    <div class="button-container">
+      <button id="btn-save" class="button">Save</button>
+      <button id="btn-cancel" class="button">Cancel</button>
+    </div>
+  </div>
 
-    <script src="popup.js"></script>
-  </body>
+  <script src="popup.js"></script>
+</body>
+
 </html>

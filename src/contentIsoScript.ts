@@ -55,7 +55,6 @@ async function onEditorUpdate(
   const config = await chrome.storage.local.get([CONFIG_DISABLE_COMPLETION]);
   if (!!config[CONFIG_DISABLE_COMPLETION]) return;
 
-  const completion = await GetOrLoadCompletion(content, signal);
 
   const scroller = document.querySelector('div.cm-scroller');
   if (scroller == null) return;
@@ -71,10 +70,10 @@ async function onEditorUpdate(
   }
 
   document.getElementById('copilot-suggestion')?.remove();
-  const text = document.createTextNode(completion);
+  const placeholder = document.createTextNode('Generating...');
   const suggestion = document.createElement('div');
   suggestion.setAttribute('id', 'copilot-suggestion-content');
-  suggestion.appendChild(text);
+  suggestion.appendChild(placeholder);
 
   const editorRect = editor.getBoundingClientRect();
   suggestion.style.width = `${editorRect.width}px`;
@@ -93,6 +92,11 @@ async function onEditorUpdate(
   layer.setAttribute('data-pos', `${pos}`);
   layer.appendChild(suggestion);
   scroller.appendChild(layer);
+
+  const completion = await GetOrLoadCompletion(content, signal);
+  suggestion.removeChild(placeholder);
+  suggestion.appendChild(document.createTextNode(completion));
+  layer.setAttribute('data-completed', 'true');
 }
 
 async function onConfigUpdate() {
