@@ -2,6 +2,8 @@
 
 import { CONFIG_MAX_PROMPT_WORDS } from './constants';
 import { EditorContent } from './types';
+import { onAcceptImprovement, onAcceptPartialSuggestion, onAcceptSuggestion } from './utils/actions';
+import { updateSuggestionOnCursorUpdate } from './utils/dom';
 
 let maxPromptWords = 500;
 
@@ -10,10 +12,12 @@ function debounce<T extends () => void>(func: T): () => void {
 
   return function () {
     document.getElementById('copilot-sidebar-button')?.remove();
-    document.getElementById('copilot-suggestion')?.remove();
     document.getElementById('copilot-side-panel')?.remove();
+    const shouldGenerateSuggestion = updateSuggestionOnCursorUpdate();
 
     if (timeout) clearTimeout(timeout);
+
+    if (!shouldGenerateSuggestion) return;
 
     timeout = setTimeout(() => {
       func();
@@ -22,20 +26,11 @@ function debounce<T extends () => void>(func: T): () => void {
   };
 }
 
-function onAcceptSuggestion(content: EditorContent) {
-  const suggestion = document.getElementById('copilot-suggestion');
-  if (suggestion?.getAttribute('data-completed') == 'true') {
-    const currentPos = content.cmView.view.state.selection.main.head;
-    const posAttr = suggestion.getAttribute('data-pos');
-    const pos = posAttr ? parseInt(posAttr) : currentPos;
-    const changes = { from: pos, to: currentPos, insert: suggestion.innerText };
-    content.cmView.view.dispatch({ changes });
-  }
-}
-
 function onKeyDown(event: KeyboardEvent) {
   if (event.key == 'Tab') {
     onAcceptSuggestion(event.target as unknown as EditorContent);
+  } else if ((event.metaKey || event.ctrlKey) && event.key == 'ArrowRight') {
+    onAcceptPartialSuggestion(event.target as unknown as EditorContent);
   }
 }
 
@@ -102,27 +97,6 @@ function onCursorUpdate() {
 
 function onConfigUpdate(e: CustomEvent<{ [CONFIG_MAX_PROMPT_WORDS]: number }>) {
   maxPromptWords = e.detail[CONFIG_MAX_PROMPT_WORDS] || maxPromptWords;
-}
-
-function onAcceptImprovement(
-  e: CustomEvent<{ improvement: string; from: number; to: number }>
-) {
-  var editor = document.querySelector('.cm-content');
-  if (!editor) return;
-  const content = editor as any as EditorContent;
-  const state = content.cmView.view.state;
-  if (
-    state.selection.main.from == e.detail.from &&
-    state.selection.main.to == e.detail.to
-  ) {
-    const changes = {
-      from: e.detail.from,
-      to: e.detail.to,
-      insert: e.detail.improvement,
-    };
-    const selection = { anchor: e.detail.from + e.detail.improvement.length };
-    content.cmView.view.dispatch({ changes, selection });
-  }
 }
 
 window.addEventListener(

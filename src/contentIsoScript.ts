@@ -9,6 +9,7 @@ import {
   CONFIG_DISABLE_IMPROVEMENT,
   CONFIG_MAX_PROMPT_WORDS,
 } from './constants';
+import { createSuggestion } from './utils/dom';
 
 let cursorPos: { row: number; column: number } | null = null;
 
@@ -55,48 +56,22 @@ async function onEditorUpdate(
   const config = await chrome.storage.local.get([CONFIG_DISABLE_COMPLETION]);
   if (!!config[CONFIG_DISABLE_COMPLETION]) return;
 
-
-  const scroller = document.querySelector('div.cm-scroller');
+  const scroller = document.querySelector('div.cm-scroller') as HTMLElement;
   if (scroller == null) return;
 
   const editor = scroller.querySelector('div.cm-content') as HTMLElement;
   if (editor == null) return;
 
   const cursor = document.querySelector('.cm-cursor-primary') as HTMLElement;
-  if (cursor == null) return;
+  if (!cursor) return;
 
-  if (row != cursorPos?.row || col != cursorPos?.column) {
-    return;
-  }
-
-  document.getElementById('copilot-suggestion')?.remove();
-  const placeholder = document.createTextNode('Generating...');
-  const suggestion = document.createElement('div');
-  suggestion.setAttribute('id', 'copilot-suggestion-content');
-  suggestion.appendChild(placeholder);
-
-  const editorRect = editor.getBoundingClientRect();
-  suggestion.style.width = `${editorRect.width}px`;
-  suggestion.style.top = cursor.style.top;
-  suggestion.style.textIndent = `${parseInt(cursor.style.left) - 50}px`;
-
-  const suggestionBackground = document.createElement('div');
-  suggestionBackground.setAttribute('id', 'copilot-suggestion-background');
-  suggestion.appendChild(suggestionBackground);
-  suggestion.onclick = () =>
-    document.getElementById('copilot-suggestion')?.remove();
-
-  const layer = document.createElement('div');
-  layer.setAttribute('class', 'cm-layer');
-  layer.setAttribute('id', 'copilot-suggestion');
-  layer.setAttribute('data-pos', `${pos}`);
-  layer.appendChild(suggestion);
-  scroller.appendChild(layer);
+  const { suggestionContent, suggestion } = createSuggestion(scroller, editor, cursor, 'Generating...', pos, 'generating');
+  scroller.appendChild(suggestion);
 
   const completion = await GetOrLoadCompletion(content, signal);
-  suggestion.removeChild(placeholder);
-  suggestion.appendChild(document.createTextNode(completion));
-  layer.setAttribute('data-completed', 'true');
+  suggestionContent.removeChild(suggestionContent.firstChild!);
+  suggestionContent.prepend(document.createTextNode(completion));
+  suggestion.setAttribute('data-status', 'completed');
 }
 
 async function onConfigUpdate() {
