@@ -24,7 +24,7 @@ function debounce<T extends () => void>(func: T): () => void {
 
 function onAcceptSuggestion(content: EditorContent) {
   const suggestion = document.getElementById('copilot-suggestion');
-  if (!!suggestion) {
+  if (suggestion?.getAttribute('data-completed') == 'true') {
     const currentPos = content.cmView.view.state.selection.main.head;
     const posAttr = suggestion.getAttribute('data-pos');
     const pos = posAttr ? parseInt(posAttr) : currentPos;
