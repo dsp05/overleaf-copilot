@@ -59,7 +59,7 @@ async function onEditorUpdate(
 
   if (!!suggestionManager.currentSuggestion) return;
 
-  const suggestion = suggestionManager.createNewSuggestion('Generating...', pos);
+  const suggestion = suggestionManager.createNewSuggestion('...', pos);
   if (!suggestion) return;
 
   const completion = await GetOrLoadCompletion(content, signal);
