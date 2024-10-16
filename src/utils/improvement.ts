@@ -8,6 +8,7 @@ import {
   CONFIG_MODEL,
   DEFAULT_MODEL,
 } from '../constants';
+import { PostProcessResponse } from './helper';
 
 export async function GetImprovement(selection: string) {
   const config = await chrome.storage.local.get([
@@ -38,7 +39,7 @@ export async function GetImprovement(selection: string) {
     model: config[CONFIG_MODEL] || DEFAULT_MODEL,
   });
 
-  return completion.choices[0].message.content?.trim() ?? '';
+  return PostProcessResponse(completion.choices[0].message.content);
 }
 
 function buildImprovePrompt(selection: string, template: string) {

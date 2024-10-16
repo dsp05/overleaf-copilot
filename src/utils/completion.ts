@@ -12,6 +12,7 @@ import {
   DEFAULT_MAX_TOKEN,
   DEFAULT_MODEL,
 } from '../constants';
+import { PostProcessResponse } from './helper';
 
 const completionCache = new Map<string, string>();
 const cacheSize = 100;
@@ -70,7 +71,7 @@ async function getCompletion(input: string, signal: AbortSignal) {
     }
     throw err;
   }
-  return completion.choices[0].message.content?.trim() ?? '';
+  return PostProcessResponse(completion.choices[0].message.content);
 }
 
 function buildCompletionPrompt(input: string, template: string) {
@@ -81,8 +82,7 @@ function buildCompletionPrompt(input: string, template: string) {
   }
 
   return (
-    `Continue ${
-      input.endsWith('\n') ? '' : 'the last paragraph of '
+    `Continue ${input.endsWith('\n') ? '' : 'the last paragraph of '
     }the academic paper in LaTeX below, ` +
     `making sure to maintain semantic continuity.\n\n` +
     `### Beginning of the paper ###\n` +
