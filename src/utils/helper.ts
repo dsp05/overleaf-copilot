@@ -1,5 +1,5 @@
 
-const Prefixes = ["```latex\n", "```latex"];
+const Prefixes = ["```latex\n", "```latex", "```"];
 const Suffixes = ["\n```", "```"];
 
 export function PostProcessResponse(response: string | null) {
