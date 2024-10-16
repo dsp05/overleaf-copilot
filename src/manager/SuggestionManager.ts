@@ -83,9 +83,13 @@ export class SuggestionManager {
 
         let acceptedLength = text.length;
         let hasContent = false;
+
+        const isSpace = (c: string) => c == ' ' || c == '\n';
+
         for (let i = 0; i < text.length; i++) {
-            hasContent ||= (text[i] != ' ');
-            if (hasContent && text[i] == ' ') { acceptedLength = i; break; }
+            const b = isSpace(text[i]);
+            hasContent ||= !b;
+            if (hasContent && b) { acceptedLength = i; break; }
         }
         const accepted = text.substring(0, acceptedLength);
         const changes = { from: pos, to: pos, insert: accepted };
