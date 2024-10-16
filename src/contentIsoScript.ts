@@ -9,9 +9,10 @@ import {
   CONFIG_DISABLE_IMPROVEMENT,
   CONFIG_MAX_PROMPT_WORDS,
 } from './constants';
-import { createSuggestion } from './utils/dom';
+import { SuggestionManager } from './manager/SuggestionManager';
 
 let cursorPos: { row: number; column: number } | null = null;
+const suggestionManager = new SuggestionManager();
 
 function debounce<
   T extends (
@@ -56,22 +57,14 @@ async function onEditorUpdate(
   const config = await chrome.storage.local.get([CONFIG_DISABLE_COMPLETION]);
   if (!!config[CONFIG_DISABLE_COMPLETION]) return;
 
-  const scroller = document.querySelector('div.cm-scroller') as HTMLElement;
-  if (scroller == null) return;
+  if (!!suggestionManager.currentSuggestion) return;
 
-  const editor = scroller.querySelector('div.cm-content') as HTMLElement;
-  if (editor == null) return;
-
-  const cursor = document.querySelector('.cm-cursor-primary') as HTMLElement;
-  if (!cursor) return;
-
-  const { suggestionContent, suggestion } = createSuggestion(scroller, editor, cursor, 'Generating...', pos, 'generating');
-  scroller.appendChild(suggestion);
+  const suggestion = suggestionManager.createNewSuggestion('Generating...', pos);
+  if (!suggestion) return;
 
   const completion = await GetOrLoadCompletion(content, signal);
-  suggestionContent.removeChild(suggestionContent.firstChild!);
-  suggestionContent.prepend(document.createTextNode(completion));
-  suggestion.setAttribute('data-status', 'completed');
+
+  suggestion.toCompleted(completion);
 }
 
 async function onConfigUpdate() {
