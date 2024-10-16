@@ -2,10 +2,11 @@
 
 import { CONFIG_MAX_PROMPT_WORDS } from './constants';
 import { EditorContent } from './types';
-import { onAcceptImprovement, onAcceptPartialSuggestion, onAcceptSuggestion } from './utils/actions';
-import { updateSuggestionOnCursorUpdate } from './utils/dom';
+import { SuggestionManager } from './manager/SuggestionManager';
+import { onAcceptImprovement } from './utils/actions';
 
 let maxPromptWords = 500;
+const suggestionManager = new SuggestionManager();
 
 function debounce<T extends () => void>(func: T): () => void {
   let timeout: NodeJS.Timeout | null;
@@ -13,11 +14,9 @@ function debounce<T extends () => void>(func: T): () => void {
   return function () {
     document.getElementById('copilot-sidebar-button')?.remove();
     document.getElementById('copilot-side-panel')?.remove();
-    const shouldGenerateSuggestion = updateSuggestionOnCursorUpdate();
+    suggestionManager.onCursorUpdate();
 
     if (timeout) clearTimeout(timeout);
-
-    if (!shouldGenerateSuggestion) return;
 
     timeout = setTimeout(() => {
       func();
@@ -28,9 +27,9 @@ function debounce<T extends () => void>(func: T): () => void {
 
 function onKeyDown(event: KeyboardEvent) {
   if (event.key == 'Tab') {
-    onAcceptSuggestion(event.target as unknown as EditorContent);
+    suggestionManager.onAcceptSuggestion();
   } else if ((event.metaKey || event.ctrlKey) && event.key == 'ArrowRight') {
-    onAcceptPartialSuggestion(event.target as unknown as EditorContent);
+    suggestionManager.onAcceptPartialSuggestion();
   }
 }
 
