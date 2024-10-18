@@ -3,13 +3,13 @@
 import './contentIsoScript.css';
 
 import { GetOrLoadCompletion } from './utils/completion';
-import { LoadSidePanel } from './sidePanel';
 import {
   CONFIG_DISABLE_COMPLETION,
   CONFIG_DISABLE_IMPROVEMENT,
   CONFIG_MAX_PROMPT_WORDS,
 } from './constants';
 import { SuggestionManager } from './manager/SuggestionManager';
+import { ShowSidePanelToggleButton } from './utils/dom';
 
 let cursorPos: { row: number; column: number } | null = null;
 const suggestionManager = new SuggestionManager();
@@ -86,37 +86,7 @@ async function onEditorSelect(
 
   if (!!config[CONFIG_DISABLE_IMPROVEMENT]) return;
 
-  const scroller = document.querySelector('div.cm-scroller');
-  if (scroller == null) return;
-
-  const cursor = document.querySelector('.cm-cursor-primary') as HTMLElement;
-  if (cursor == null) return;
-  const button = document.createElement('div');
-  button.setAttribute('id', 'copilot-sidebar-button');
-
-  if (
-    event.detail.to - event.detail.head <
-    event.detail.head - event.detail.from
-  ) {
-    button.style.left = `${parseInt(cursor.style.left) - 25}px`;
-    button.style.top = `${parseInt(cursor.style.top) + 25}px`;
-  } else {
-    button.style.left = `${parseInt(cursor.style.left) - 35}px`;
-    button.style.top = `${parseInt(cursor.style.top) - 30}px`;
-  }
-  button.style.backgroundImage = `url("${chrome.runtime.getURL(
-    'icons/icon_128.png'
-  )}")`;
-  button.onclick = async () => {
-    document.getElementById('copilot-sidebar-button')?.remove();
-    document.getElementById('copilot-side-panel')?.remove();
-    await LoadSidePanel(
-      event.detail.selection,
-      event.detail.from,
-      event.detail.to
-    );
-  };
-  scroller.appendChild(button);
+  ShowSidePanelToggleButton(event.detail);
 }
 
 function onCursorUpdate(event: CustomEvent<{ row: number; column: number }>) {

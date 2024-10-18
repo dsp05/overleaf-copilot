@@ -35,7 +35,7 @@ div#copilot-side-panel {
 p#copilot-original-content {
   white-space: break-spaces;
   overflow-y: auto;
-  max-height: 160px;
+  max-height: 30%;
   padding: 5px 10px;
   border: solid 1px;
   border-radius: 2px;
@@ -63,16 +63,46 @@ div#copilot-similar-content-container {
 
 div#copilot-similar-content-loading-spinner {
   text-align: center;
+  margin-top: 50px;
+}
+
+div#copilot-similar-content-loading-spinner,
+div#copilot-improve-loading-spinner {
+  text-align: center;
+  margin-top: 50px;
 }
 
 div#copilot-sidebar-button {
   position: absolute;
-  width: 30px;
+  width: 60px;
   height: 30px;
-  border-radius: 50%;
-  background-size: cover;
-  cursor: pointer;
+  border-radius: 15px;
   z-index: 1000;
+  background-color: #eee;
+  filter: drop-shadow(0 0 1px black);
+  overflow: hidden;
+}
+
+div#copilot-sidebar-button div {
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  position: absolute;
+  top: 2px;
+}
+
+div#copilot-sidebar-button div:first-child {
+  left: 2px;
+}
+
+div#copilot-sidebar-button div:last-child {
+  left: 32px;
+}
+
+div#copilot-sidebar-button div:hover {
+  filter: drop-shadow(0 0 0.5px black);
+  background-color: white;
 }
 
 div.loading {

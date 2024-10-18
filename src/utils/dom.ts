@@ -1,34 +1,59 @@
+import { SidePanelManager } from "../manager/SidePanelManager";
 import { EditorContent } from "../types";
 
-export function createSuggestion(scroller: HTMLElement, editor: HTMLElement, cursor: HTMLElement,
-    text: string, pos: number, status: 'completed' | 'generating') {
+export function ShowSidePanelToggleButton(data: {
+  selection: string;
+  from: number;
+  to: number;
+  head: number;
+}) {
+  const sidePanelManager = new SidePanelManager();
 
-    const initText = document.createTextNode(text);
-    const suggestionContent = document.createElement('div');
-    suggestionContent.setAttribute('id', 'copilot-suggestion-content');
-    suggestionContent.appendChild(initText);
+  document.getElementById('copilot-sidebar-button')?.remove();
 
-    const editorRect = editor.getBoundingClientRect();
-    suggestionContent.style.width = `${editorRect.width}px`;
-    suggestionContent.style.top = cursor.style.top;
-    suggestionContent.style.textIndent = `${parseInt(cursor.style.left) - 50}px`;
+  const scroller = document.querySelector('div.cm-scroller');
+  if (scroller == null) return;
 
-    const suggestionBackground = document.createElement('div');
-    suggestionBackground.setAttribute('id', 'copilot-suggestion-background');
-    suggestionContent.appendChild(suggestionBackground);
-    suggestionContent.onclick = () =>
-        document.getElementById('copilot-suggestion')?.remove();
+  const cursor = document.querySelector('.cm-cursor-primary') as HTMLElement;
+  if (cursor == null) return;
 
-    const suggestion = document.createElement('div');
-    suggestion.setAttribute('class', 'cm-layer');
-    suggestion.setAttribute('id', 'copilot-suggestion');
-    suggestion.setAttribute('data-pos', `${pos}`);
-    suggestion.setAttribute('data-status', status);
-    suggestion.appendChild(suggestionContent);
+  const button = document.createElement('div');
+  button.setAttribute('id', 'copilot-sidebar-button');
 
-    return { suggestionContent, suggestion };
+  if (
+    data.to - data.head <
+    data.head - data.from
+  ) {
+    button.style.left = `${parseInt(cursor.style.left) - 25}px`;
+    button.style.top = `${parseInt(cursor.style.top) + 25}px`;
+  } else {
+    button.style.left = `${parseInt(cursor.style.left) - 35}px`;
+    button.style.top = `${parseInt(cursor.style.top) - 30}px`;
+  }
+
+  const improveButton = document.createElement('div');
+  improveButton.style.backgroundImage = `url("${chrome.runtime.getURL(
+    'icons/icon_128.png'
+  )}")`;
+  improveButton.style.backgroundSize = 'cover';
+  improveButton.onclick = async () => {
+    await sidePanelManager.onImprove(data.selection, data.from, data.to);
+  };
+  button.appendChild(improveButton);
+
+  const searchButton = document.createElement('div');
+  searchButton.style.backgroundImage = `url("${chrome.runtime.getURL(
+    'icons/icon_search_128.png'
+  )}")`;
+  searchButton.style.backgroundSize = 'cover';
+  searchButton.onclick = async () => {
+    await sidePanelManager.onFindSimilar(data.selection);
+  };
+  button.appendChild(searchButton);
+
+  scroller.appendChild(button);
 }
 
 export function GetCurrentEditorContent() {
-    return document.querySelector('.cm-content') as any as EditorContent;
+  return document.querySelector('.cm-content') as any as EditorContent;
 }
