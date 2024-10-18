@@ -31,9 +31,9 @@ import './popup.css';
         const apiKey = result[CONFIG_API_KEY] as string;
         if (!!apiKey) {
           const maskedApiKey =
-            apiKey.length <= 3
+            apiKey.length <= 6
               ? '***'
-              : apiKey.substring(0, 3) + '*'.repeat(apiKey.length - 3);
+              : apiKey.substring(0, 3) + '***' + apiKey.substring(apiKey.length - 3);
           document
             .getElementById(CONFIG_API_KEY)!
             .setAttribute('placeholder', maskedApiKey);

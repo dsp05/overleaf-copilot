@@ -16,6 +16,7 @@ import { PostProcessResponse } from './helper';
 
 const completionCache = new Map<string, string>();
 const cacheSize = 100;
+const HOSTED_COMPLETE_URL = 'https://embedding.azurewebsites.net/complete';
 
 export async function GetOrLoadCompletion(input: string, signal: AbortSignal) {
   const key = `completion-${computeMD5Hash(input)}`;
@@ -39,7 +40,15 @@ async function getCompletion(input: string, signal: AbortSignal) {
     CONFIG_COMPLETION_CUSTOM_PROMPT,
   ]);
 
-  if (!config[CONFIG_API_KEY]) return '';
+  if (!config[CONFIG_API_KEY]) {
+    const response = await fetch(HOSTED_COMPLETE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: input }),
+    });
+
+    return (await response.json())["content"];
+  };
 
   const openai = new OpenAI({
     apiKey: config[CONFIG_API_KEY],

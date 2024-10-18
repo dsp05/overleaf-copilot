@@ -10,6 +10,8 @@ import {
 } from '../constants';
 import { PostProcessResponse } from './helper';
 
+const HOSTED_IMPROVE_URL = 'https://embedding.azurewebsites.net/improve';
+
 export async function GetImprovement(selection: string) {
   const config = await chrome.storage.local.get([
     CONFIG_API_KEY,
@@ -18,7 +20,15 @@ export async function GetImprovement(selection: string) {
     CONFIG_IMPROVEMENT_CUSTOM_PROMPT,
   ]);
 
-  if (!config[CONFIG_API_KEY]) return '';
+  if (!config[CONFIG_API_KEY]) {
+    const response = await fetch(HOSTED_IMPROVE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: selection }),
+    });
+
+    return (await response.json())["content"];
+  };
 
   const openai = new OpenAI({
     apiKey: config[CONFIG_API_KEY],
