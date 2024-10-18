@@ -13,7 +13,9 @@
     {
       "resources": [
         "icons/icon_128.png",
-        "sidePanel.html",
+        "icons/icon_search_128.png",
+        "sidePanelFindSimilar.html",
+        "sidePanelImprove.html",
         "search.html"
       ],
       "matches": [
