@@ -47,7 +47,7 @@ async function getCompletion(input: string, signal: AbortSignal) {
       body: JSON.stringify({ content: input }),
     });
 
-    return (await response.json())["content"];
+    return PostProcessResponse((await response.json())["content"]);
   };
 
   const openai = new OpenAI({

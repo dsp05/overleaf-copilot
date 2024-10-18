@@ -27,7 +27,7 @@ export async function GetImprovement(selection: string) {
       body: JSON.stringify({ content: selection }),
     });
 
-    return (await response.json())["content"];
+    return PostProcessResponse((await response.json())["content"]);
   };
 
   const openai = new OpenAI({
