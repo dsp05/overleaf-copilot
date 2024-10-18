@@ -1,3 +1,4 @@
+import { CONFIG_API_KEY } from "../constants";
 import { GetImprovement } from "../utils/improvement";
 import { fetchMetadata, search } from "../utils/search";
 
@@ -90,7 +91,19 @@ async function generate(selection: string, sidePanel: HTMLElement) {
   const spinner = document.getElementById('copilot-improve-loading-spinner')!
   parent.style.display = 'none';
   spinner.style.display = 'block';
-  const improvement = await GetImprovement(selection);
+
+  let improvement = ''
+  try {
+    improvement = await GetImprovement(selection);
+  } catch (error) {
+    const config = await chrome.storage.local.get([CONFIG_API_KEY]);
+    if (!config[CONFIG_API_KEY]) {
+      improvement = 'Server is at capacity. Please try again later or use your own OpenAI API key.';
+    } else {
+      improvement = 'An error occurred while generating the content. Please try again later.\nError: ' + error;
+    }
+  }
+
   textarea.value = improvement;
   textarea.style.height = `${document.getElementById('copilot-original-content')!.clientHeight}px`;
   parent.style.display = 'block';

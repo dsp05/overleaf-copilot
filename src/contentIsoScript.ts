@@ -4,6 +4,7 @@ import './contentIsoScript.css';
 
 import { GetOrLoadCompletion } from './utils/completion';
 import {
+  CONFIG_API_KEY,
   CONFIG_DISABLE_COMPLETION,
   CONFIG_DISABLE_IMPROVEMENT,
   CONFIG_MAX_PROMPT_WORDS,
@@ -62,7 +63,21 @@ async function onEditorUpdate(
   const suggestion = suggestionManager.createNewSuggestion('...', pos);
   if (!suggestion) return;
 
-  const completion = await GetOrLoadCompletion(content, signal);
+  let completion = '';
+
+  try {
+    completion = await GetOrLoadCompletion(content, signal);
+  } catch (error) {
+    const config = await chrome.storage.local.get([CONFIG_API_KEY]);
+    if (!config[CONFIG_API_KEY]) {
+      completion = 'Server is at capacity. Please try again later or use your own OpenAI API key.';
+    } else {
+      completion = 'An error occurred while generating the content. Please try again later.';
+    }
+
+    suggestion.toError(completion);
+    return;
+  }
 
   suggestion.toCompleted(completion);
 }

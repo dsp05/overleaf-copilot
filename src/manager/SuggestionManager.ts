@@ -128,6 +128,12 @@ class Suggestion {
         this.text = text;
     }
 
+    public toError(text: string) {
+        this.status = 'error';
+        this.text = text;
+        document.getElementById('copilot-suggestion-content')!.style.color = 'red';
+    }
+
     public toPartialAccepted(length: number) {
         this.status = 'partial-accepted';
         this.dom.setAttribute('data-partial-accepted-length', `${length}`);
@@ -165,4 +171,4 @@ class Suggestion {
     }
 }
 
-export type SuggestonStatus = 'generating' | 'completed' | 'partial-accepted';
+export type SuggestonStatus = 'generating' | 'completed' | 'partial-accepted' | 'error';
