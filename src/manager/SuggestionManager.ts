@@ -131,6 +131,7 @@ class Suggestion {
     public toError(text: string) {
         this.status = 'error';
         this.text = text;
+        document.getElementById('copilot-suggestion-content')!.style.color = 'red';
     }
 
     public toPartialAccepted(length: number) {
