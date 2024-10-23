@@ -26,8 +26,10 @@
   },
   "dependencies": {
     "@types/crypto-js": "^4.1.2",
+    "@types/diff": "^5.2.3",
     "@types/node": "^20.6.2",
     "crypto-js": "^4.1.1",
+    "diff": "^7.0.0",
     "openai": "^4.8.0",
     "rss-parser": "^3.13.0"
   }
