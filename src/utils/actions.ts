@@ -16,8 +16,13 @@ export function onAcceptImprovement(
       state.selection.main.from,
       state.selection.main.to
     )
-    const changes = [];
-    const diffs = Diff.diffWordsWithSpace(originalContent, e.detail.improvement);
+    let changes = [];
+    let diffs = Diff.diffChars(originalContent, e.detail.improvement);
+
+    if (diffs.length >= 500) {
+      diffs = Diff.diffWordsWithSpace(originalContent, e.detail.improvement);
+    }
+
     if (diffs.length >= 500) {
       changes.push({
         from: e.detail.from,
