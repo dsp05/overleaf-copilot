@@ -20,7 +20,7 @@ export function onAcceptImprovement(
     let diffs = Diff.diffChars(originalContent, e.detail.improvement);
 
     if (diffs.length >= 500) {
-      diffs = Diff.diffWords(originalContent, e.detail.improvement);
+      diffs = Diff.diffWordsWithSpace(originalContent, e.detail.improvement);
     }
 
     if (diffs.length >= 500) {
