@@ -9,11 +9,11 @@ const PATHS = require('./paths');
 const config = (env, argv) =>
   merge(common, {
     entry: {
-      popup: PATHS.src + '/popup.ts',
-      contentMainScript: PATHS.src + '/contentMainScript.ts',
-      contentIsoScript: PATHS.src + '/contentIsoScript.ts',
+      contentMainScript: PATHS.src + '/main/contentScript.ts',
+      contentIsoScript: PATHS.src + '/iso//contentScript.ts',
       background: PATHS.src + '/background.ts',
       search: PATHS.src + '/search.ts',
+      options: PATHS.src + '/components/Options.tsx',
     },
     devtool: argv.mode === 'production' ? false : 'source-map',
     resolve: {

@@ -72,9 +72,10 @@ div#copilot-improve-loading-spinner {
   margin-top: 50px;
 }
 
-div#copilot-sidebar-button {
+div#copilot-toolbar {
   position: absolute;
-  width: 60px;
+  display: flex;
+  padding: 2px;
   height: 30px;
   border-radius: 15px;
   z-index: 1000;
@@ -83,26 +84,32 @@ div#copilot-sidebar-button {
   overflow: hidden;
 }
 
-div#copilot-sidebar-button div {
+div#copilot-toolbar div {
   border-radius: 50%;
   width: 26px;
   height: 26px;
   cursor: pointer;
-  position: absolute;
-  top: 2px;
+  background-color: rgb(7, 109, 53);
+  margin-left: 2px;
+  padding: 5px;
+  color: white;
 }
 
-div#copilot-sidebar-button div:first-child {
-  left: 2px;
+div#copilot-toolbar div:first-child {
+  margin-left: 0;
 }
 
-div#copilot-sidebar-button div:last-child {
-  left: 32px;
-}
-
-div#copilot-sidebar-button div:hover {
+div#copilot-toolbar div:hover {
+  background-color: rgb(24, 86, 52);
   filter: drop-shadow(0 0 0.5px black);
-  background-color: white;
+}
+
+div#copilot-toolbar div.search {
+  background-color: #3265b2;
+}
+
+div#copilot-toolbar div.search:hover {
+  background-color: #295392;
 }
 
 div.loading {

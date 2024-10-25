@@ -1,0 +1,44 @@
+.icon-select {
+  display: inline-block;
+  position: relative;
+}
+
+.icon-select .icon {
+  color: white;
+  background-color: rgb(7, 109, 53);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  padding: 5px;
+  float: left;
+}
+
+.icon-select .icon-list {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: start;
+  width: 278px;
+  gap: 2px;
+  position: absolute;
+  top: 30px;
+  left: -5px;
+  filter: drop-shadow(0 0 1px black);
+  padding: 5px;
+  background-color: #eee;
+  border-radius: 2px;
+}
+
+.icon-select .icon-list .icon:hover {
+  background-color: rgb(24, 86, 52);
+  filter: drop-shadow(0 0 0.5px black);
+}
+
+.icon-select .icon-list .icon {
+  cursor: pointer;
+}
+
+.icon-select a {
+  line-height: 26px;
+  margin-left: 10px;
+}
