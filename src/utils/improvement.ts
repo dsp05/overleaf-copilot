@@ -8,7 +8,7 @@ import { GetOptions, PostProcessResponse } from './helper';
 
 const HOSTED_IMPROVE_URL = 'https://embedding.azurewebsites.net/improve';
 
-export async function getImprovement(selection: string, prompt: string) {
+export async function* getImprovement(selection: string, prompt: string) {
   const options = await GetOptions();
 
   if (!options.apiKey) {
@@ -19,32 +19,36 @@ export async function getImprovement(selection: string, prompt: string) {
     });
 
     if (!response.ok) {
-      return "Server is at capacity. Please select fewer words, try again later or use your own OpenAI API key.";
+      yield "Server is at capacity. Please select fewer words, try again later or use your own OpenAI API key.";
     }
 
-    return PostProcessResponse((await response.json())["content"]);
-  };
-
-  const openai = new OpenAI({
-    apiKey: options.apiKey,
-    baseURL: options.apiBaseUrl,
-    dangerouslyAllowBrowser: true,
-  });
-
-  try {
-    const completion = await openai.chat.completions.create({
-      messages: [
-        {
-          role: 'user',
-          content: buildImprovePrompt(selection, prompt),
-        },
-      ],
-      model: options.model || DEFAULT_MODEL,
+    yield PostProcessResponse((await response.json())["content"]);
+  } else {
+    const openai = new OpenAI({
+      apiKey: options.apiKey,
+      baseURL: options.apiBaseUrl,
+      dangerouslyAllowBrowser: true,
     });
 
-    return PostProcessResponse(completion.choices[0].message.content);
-  } catch (error) {
-    return "An error occurred while generating the content.\n" + error;
+    try {
+      const stream = await openai.chat.completions.create({
+        messages: [
+          {
+            role: 'user',
+            content: buildImprovePrompt(selection, prompt),
+          },
+        ],
+        model: options.model || DEFAULT_MODEL,
+        stream: true,
+      });
+
+      for await (const chunk of stream) {
+        yield chunk.choices[0]?.delta?.content || ''
+      }
+
+    } catch (error) {
+      yield "An error occurred while generating the content.\n" + error;
+    }
   }
 }
 
