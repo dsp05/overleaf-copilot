@@ -11,26 +11,25 @@ interface ToolbarEditorProps {
 
 
 export const ToolbarEditor = ({ data, action }: ToolbarEditorProps) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
 
   useEffect(() => {
-    getImprovement(data.selection, action.prompt)
-      .then((improvement) => {
-        setContent(improvement);
-        setLoading(false);
-      });
+    const run = async () => {
+      onRegenerate();
+    }
+    run();
   }, []);
 
-  const onRegenerate = () => {
+  const onRegenerate = async () => {
     if (loading) return;
     setContent("");
     setLoading(true);
-    getImprovement(data.selection, action.prompt)
-      .then((improvement) => {
-        setContent(improvement);
-        setLoading(false);
-      });
+    const stream = getImprovement(data.selection, action.prompt);
+    for await (const token of stream) {
+      setContent((prev) => prev + token);
+    }
+    setLoading(false);
   }
 
   const onReplace = () => {
