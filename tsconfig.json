@@ -4,6 +4,8 @@
     "target": "es6",
     "module": "commonjs",
     "esModuleInterop": true,
-    "strict": true
+    "strict": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
   }
 }

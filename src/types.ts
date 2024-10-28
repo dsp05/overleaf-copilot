@@ -24,3 +24,18 @@ export interface EditorContent {
     };
   };
 }
+
+export interface Options {
+  apiKey?: string;
+  apiBaseUrl?: string;
+  model?: string;
+
+  suggestionPromptMaxWords?: number;
+  suggestionMaxOutputToken?: number;
+  suggestionPrompt?: string;
+  suggestionDisabled?: boolean;
+
+  toolbarActions?: { name: string, prompt: string, icon: string }[];
+  toolbarSearchDisabled?: boolean;
+  toolbarDisabled?: boolean;
+}

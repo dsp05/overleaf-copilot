@@ -30,7 +30,11 @@
     "@types/node": "^20.6.2",
     "crypto-js": "^4.1.1",
     "diff": "^7.0.0",
+    "lucide": "^0.453.0",
+    "lucide-preact": "^0.453.0",
     "openai": "^4.8.0",
+    "preact": "^10.24.3",
+    "purecss": "^3.0.0",
     "rss-parser": "^3.13.0"
   }
 }

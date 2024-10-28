@@ -1,16 +1,12 @@
 'use strict';
 
-export const CONFIG_API_KEY = 'config-api-key';
-export const CONFIG_BASE_URL = 'config-base-url';
-export const CONFIG_MODEL = 'config-model';
-export const CONFIG_MAX_TOKEN = 'config-max-token';
-export const CONFIG_COMPLETION_CUSTOM_PROMPT =
-  'config-completion-custom-prompt';
-export const CONFIG_IMPROVEMENT_CUSTOM_PROMPT =
-  'config-improvement-custom-prompt';
-export const CONFIG_MAX_PROMPT_WORDS = 'config-max-prompt-words';
-export const CONFIG_DISABLE_IMPROVEMENT = 'config-disable-improvement';
-export const CONFIG_DISABLE_COMPLETION = 'config-disable-completion';
+export const LOCAL_STORAGE_KEY_OPTIONS = 'storage-key-options';
+export const LOCAL_STORAGE_KEY_API_KEY = 'config-api-key';
+export const LOCAL_STORAGE_KEY_BASE_URL = 'config-base-url';
+export const LOCAL_STORAGE_KEY_MODEL = 'config-model';
 
 export const DEFAULT_MODEL = 'gpt-3.5-turbo';
-export const DEFAULT_MAX_TOKEN = 100;
+export const DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN = 100;
+export const DEFAULT_SUGGESTION_MAX_WORDS = 500;
+
+export const MODELS = ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o", "gpt-4o-mini"];

@@ -16,7 +16,8 @@
         "icons/icon_search_128.png",
         "sidePanelFindSimilar.html",
         "sidePanelImprove.html",
-        "search.html"
+        "search.html",
+        "options.html"
       ],
       "matches": [
         "https://www.overleaf.com/*"
@@ -27,9 +28,9 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Overleaf Copilot",
-    "default_popup": "popup.html"
+    "default_title": "Overleaf Copilot"
   },
+  "options_page": "options.html",
   "permissions": [
     "storage"
   ],

@@ -4,43 +4,32 @@ import OpenAI, { APIUserAbortError } from 'openai';
 import crypto from 'crypto-js';
 import { ChatCompletion } from 'openai/resources/chat';
 import {
-  CONFIG_API_KEY,
-  CONFIG_BASE_URL,
-  CONFIG_COMPLETION_CUSTOM_PROMPT,
-  CONFIG_MAX_TOKEN,
-  CONFIG_MODEL,
-  DEFAULT_MAX_TOKEN,
+  DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
   DEFAULT_MODEL,
 } from '../constants';
-import { PostProcessResponse } from './helper';
+import { GetOptions, PostProcessResponse } from './helper';
 
 const completionCache = new Map<string, string>();
 const cacheSize = 100;
 const HOSTED_COMPLETE_URL = 'https://embedding.azurewebsites.net/complete';
 
-export async function GetOrLoadCompletion(input: string, signal: AbortSignal) {
+export async function GetOrLoadSuggestion(input: string, signal: AbortSignal) {
   const key = `completion-${computeMD5Hash(input)}`;
   if (completionCache.has(key)) {
     return completionCache.get(key) ?? '';
   }
 
-  const completion = await getCompletion(input, signal);
+  const completion = await getSuggestion(input, signal);
 
   if (completionCache.size >= cacheSize) completionCache.clear();
   completionCache.set(key, completion);
   return completion;
 }
 
-async function getCompletion(input: string, signal: AbortSignal) {
-  const config = await chrome.storage.local.get([
-    CONFIG_API_KEY,
-    CONFIG_BASE_URL,
-    CONFIG_MODEL,
-    CONFIG_MAX_TOKEN,
-    CONFIG_COMPLETION_CUSTOM_PROMPT,
-  ]);
+async function getSuggestion(input: string, signal: AbortSignal) {
+  const options = await GetOptions();
 
-  if (!config[CONFIG_API_KEY]) {
+  if (!options.apiKey) {
     const response = await fetch(HOSTED_COMPLETE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -51,8 +40,8 @@ async function getCompletion(input: string, signal: AbortSignal) {
   };
 
   const openai = new OpenAI({
-    apiKey: config[CONFIG_API_KEY],
-    baseURL: config[CONFIG_BASE_URL] || undefined,
+    apiKey: options.apiKey,
+    baseURL: options.apiBaseUrl,
     dangerouslyAllowBrowser: true,
   });
 
@@ -63,14 +52,14 @@ async function getCompletion(input: string, signal: AbortSignal) {
         messages: [
           {
             role: 'user',
-            content: buildCompletionPrompt(
+            content: buildSuggestionPrompt(
               input,
-              config[CONFIG_COMPLETION_CUSTOM_PROMPT]
+              options.suggestionPrompt,
             ),
           },
         ],
-        model: config[CONFIG_MODEL] || DEFAULT_MODEL,
-        max_tokens: parseInt(config[CONFIG_MAX_TOKEN]) || DEFAULT_MAX_TOKEN,
+        model: options.model ?? DEFAULT_MODEL,
+        max_tokens: options.suggestionMaxOutputToken ?? DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
       },
       { signal: signal }
     );
@@ -83,7 +72,7 @@ async function getCompletion(input: string, signal: AbortSignal) {
   return PostProcessResponse(completion.choices[0].message.content);
 }
 
-function buildCompletionPrompt(input: string, template: string) {
+function buildSuggestionPrompt(input: string, template: string | undefined) {
   if (!!template) {
     if (template.indexOf('<input>') >= 0)
       return template.replace('<input>', input);

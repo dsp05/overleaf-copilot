@@ -1,20 +1,18 @@
 'use strict';
 
-import { CONFIG_MAX_PROMPT_WORDS } from './constants';
-import { EditorContent } from './types';
-import { SuggestionManager } from './manager/SuggestionManager';
-import { onAcceptImprovement } from './utils/actions';
+import { Options } from '../types';
+import { DEFAULT_SUGGESTION_MAX_WORDS } from '../constants';
+import { getCurrentEditorContent, updateSuggestionOnCursorUpdate } from './helpers';
+import { onAcceptPartialSuggestion, onAcceptSuggestion, onReplaceContent } from './handlers';
 
-let maxPromptWords = 500;
-const suggestionManager = new SuggestionManager();
+let options: Options | undefined = undefined;
 
 function debounce<T extends () => void>(func: T): () => void {
   let timeout: NodeJS.Timeout | null;
 
   return function () {
-    document.getElementById('copilot-sidebar-button')?.remove();
-    document.getElementById('copilot-side-panel')?.remove();
-    suggestionManager.onCursorUpdate();
+    document.getElementById('copilot-toolbar')?.remove();
+    updateSuggestionOnCursorUpdate();
 
     if (timeout) clearTimeout(timeout);
 
@@ -27,20 +25,25 @@ function debounce<T extends () => void>(func: T): () => void {
 
 function onKeyDown(event: KeyboardEvent) {
   if (event.key == 'Tab') {
-    suggestionManager.onAcceptSuggestion();
+    onAcceptSuggestion();
   } else if ((event.metaKey || event.ctrlKey) && event.key == 'ArrowRight') {
-    suggestionManager.onAcceptPartialSuggestion();
+    onAcceptPartialSuggestion();
   }
 }
 
 function onCursorUpdate() {
-  var editor = document.querySelector('.cm-content');
+  if (options == undefined) return;
+
+  const maxPromptWords = options.suggestionPromptMaxWords || DEFAULT_SUGGESTION_MAX_WORDS;;
+
+  var editor = getCurrentEditorContent();
   if (!editor) return;
-  const state = (editor as any as EditorContent).cmView.view.state;
+
+  const state = editor.cmView.view.state;
 
   if (state.selection.main.from != state.selection.main.to) {
-    // Selection is not empty.
-    if (state.selection.main.to - state.selection.main.from >= 2000) return;
+    // Selection is not empty. Show the toolbar;
+    if (state.selection.main.to - state.selection.main.from >= 5000) return;
     window.dispatchEvent(
       new CustomEvent('copilot:editor:select', {
         detail: {
@@ -55,7 +58,7 @@ function onCursorUpdate() {
       })
     );
   } else {
-    // Selection is empty.
+    // Selection is empty. Show the suggestion.
     const pos = state.selection.main.head;
     const line = state.doc.lineAt(pos);
     const col = pos - line.from;
@@ -94,19 +97,13 @@ function onCursorUpdate() {
   }
 }
 
-function onConfigUpdate(e: CustomEvent<{ [CONFIG_MAX_PROMPT_WORDS]: number }>) {
-  maxPromptWords = e.detail[CONFIG_MAX_PROMPT_WORDS] || maxPromptWords;
+function onOptionsUpdate(e: CustomEvent<{ options: Options }>) {
+  options = e.detail.options;
 }
 
-window.addEventListener(
-  'copilot:editor:replace',
-  onAcceptImprovement as EventListener
-);
+window.addEventListener('copilot:editor:replace', onReplaceContent as EventListener);
 window.addEventListener('cursor:editor:update', debounce(onCursorUpdate));
-window.addEventListener(
-  'copilot:config:update',
-  onConfigUpdate as EventListener
-);
+window.addEventListener('copilot:options:update', onOptionsUpdate as EventListener);
 
 // REVIEW dsp05: This isn't very ideal, need to investigate what was changed.
 const setupKeydownListener = (n: number) => {
