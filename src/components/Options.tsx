@@ -80,8 +80,11 @@ const OptionsForm = () => {
             <span class="pure-form-message-inline pure-u-1-3">Select the model you want to use.</span>
           </div>
           <h2>Suggestion</h2>
-          <p>This section customizes how suggestions work. Suggestions are triggered when you type a space at the end of a
-            line or press Enter to start a new line."</p>
+          <div class="pure-u-3-4">
+            <p>This section customizes how suggestions work. Suggestions are triggered when you type a space at the end of a
+              line or press Enter to start a new line. To accept a suggestion, press Tab to insert the entire text,
+              or use Ctrl/Command + right arrow to insert it word by word.</p>
+          </div>
           <div class="pure-control-group">
             <label for="field-suggestion-prompt-max-words">Prompt max words</label>
             <input class="pure-input-1-4" type="number" id="field-suggestion-prompt-max-words" placeholder="500" value={state.suggestionPromptMaxWords}
@@ -110,7 +113,9 @@ const OptionsForm = () => {
           </div>
 
           <h2>Toolbar</h2>
-          <p>This section customizes how the toolbar works. You can add and customize multiple actions. It's triggered when you select a piece of text in the editor.</p>
+          <div class="pure-u-3-4">
+            <p>This section customizes how the toolbar works. You can add and customize multiple actions. It's triggered when you select a piece of text in the editor.</p>
+          </div>
           {
             state.toolbarActions?.map((action, index) => (
               <Fragment>
@@ -153,6 +158,7 @@ const OptionsForm = () => {
           }
           <div class="pure-controls">
             <button class="pure-button" type="button" onClick={onAddAction}>+</button>
+            <span class="pure-form-message-inline">Add a new custom action to the toolbar.</span>
           </div>
           <div class="pure-controls">
             <label for="field-search-disabled" class="pure-checkbox">
