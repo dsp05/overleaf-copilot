@@ -68,11 +68,10 @@ async function onEditorUpdate(
   try {
     completion = await GetOrLoadSuggestion(content, signal);
   } catch (error) {
-    const config = await chrome.storage.local.get([LOCAL_STORAGE_KEY_API_KEY]);
-    if (!config[LOCAL_STORAGE_KEY_API_KEY]) {
+    if (!options.apiKey) {
       completion = 'Server is at capacity. Please try again later or use your own OpenAI API key.';
     } else {
-      completion = 'An error occurred while generating the content. Please try again later.';
+      completion = 'An error occurred while generating the content. ' + error;
     }
 
     suggestion.toError(completion);

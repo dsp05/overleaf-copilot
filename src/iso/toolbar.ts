@@ -1,4 +1,4 @@
-import { onFindSimilar, onToolbarAction } from "./sidePanel";
+import { onFindSimilar } from "./sidePanel";
 import { Options } from "../types";
 import {
   ALargeSmall, BookCheck, Bookmark, BookmarkCheck, BookOpenCheck,
@@ -6,8 +6,10 @@ import {
   Pencil, PencilLine, PencilOff, PencilRuler, PenLine, PenOff, Ruler, Save, Search,
   SquarePen, SearchCheck, Send, CircleX, SpellCheck, SpellCheck2, UserRoundCheck, Languages,
   Globe, BookType, MessageCircleMore, ChevronsUp, MessageSquareQuote, MessageCirclePlus, Sigma,
-  X, Infinity, Expand, Shrink, CaseSensitive
+  X, Infinity, Expand, Shrink, CaseSensitive, Replace, RotateCcw
 } from 'lucide';
+import { h, render } from "preact";
+import { ToolbarEditor, ToolbarPosition } from "../components/ToolbarEditor";
 
 export function showToolbar(data: {
   selection: string;
@@ -16,6 +18,7 @@ export function showToolbar(data: {
   head: number;
 }, options: Options) {
   document.getElementById('copilot-toolbar')?.remove();
+  document.getElementById('copilot-toolbar-editor')?.remove();
 
   const scroller = document.querySelector('div.cm-scroller');
   if (scroller == null) return;
@@ -26,10 +29,8 @@ export function showToolbar(data: {
   const toolbar = document.createElement('div');
   toolbar.setAttribute('id', 'copilot-toolbar');
 
-  if (
-    data.to - data.head <
-    data.head - data.from
-  ) {
+  const position: ToolbarPosition = data.to - data.head < data.head - data.from ? "down" : "up";
+  if (position == "down") {
     toolbar.style.left = `${parseInt(cursor.style.left) - 25}px`;
     toolbar.style.top = `${parseInt(cursor.style.top) + 25}px`;
   } else {
@@ -40,19 +41,20 @@ export function showToolbar(data: {
   for (const action of options.toolbarActions ?? []) {
     const botton = document.createElement('div');
     botton.title = action.name ?? "Rewrite";
+    botton.className = 'button';
     const icon = createElement(iconsMap[action.icon] ?? Pen);
     icon.setAttribute('width', '16');
     icon.setAttribute('height', '16');
     botton.appendChild(icon);
-    botton.onclick = async () => {
-      await onToolbarAction(data.selection, data.from, data.to, action.prompt);
+    botton.onclick = () => {
+      onToolbarAction(position, data, action);
     };
     toolbar.appendChild(botton);
   }
 
   if (!options.toolbarSearchDisabled) {
     const button = document.createElement('div');
-    button.className = 'search';
+    button.className = 'button search';
     button.title = 'Search';
     const icon = createElement(Search);
     icon.setAttribute('width', '16');
@@ -65,6 +67,30 @@ export function showToolbar(data: {
   }
 
   scroller.appendChild(toolbar);
+}
+
+function onToolbarAction(position: ToolbarPosition,
+  data: { selection: string, from: number, to: number },
+  action: { name: string, prompt: string, icon: string }) {
+  const toolbar = document.getElementById('copilot-toolbar');
+  if (toolbar == null)
+    return;
+
+  const scroller = document.querySelector('div.cm-scroller');
+  if (scroller == null) return;
+
+  document.getElementById('copilot-toolbar-editor')?.remove();
+
+  const toolbarEditor = document.createElement('div');
+  toolbarEditor.setAttribute('id', 'copilot-toolbar-editor');
+
+  if (position == "down")
+    toolbarEditor.style.top = `${parseInt(toolbar.style.top) + 35}px`;
+  else
+    toolbarEditor.style.top = `${parseInt(toolbar.style.top) - 205}px`;
+
+  scroller.appendChild(toolbarEditor);
+  render(h(ToolbarEditor, { action, data }), toolbarEditor);
 }
 
 const iconsMap: { [key: string]: IconNode } = {
@@ -108,4 +134,6 @@ const iconsMap: { [key: string]: IconNode } = {
   'expand': Expand,
   'shrink': Shrink,
   'case-sensitive': CaseSensitive,
+  'replace': Replace,
+  'rotate-ccw': RotateCcw,
 }

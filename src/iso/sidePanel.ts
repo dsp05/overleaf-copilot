@@ -1,42 +1,4 @@
-import { LOCAL_STORAGE_KEY_API_KEY } from "../constants";
-import { GetImprovement } from "../utils/improvement";
 import { fetchMetadata, search } from "../utils/search";
-
-export async function onToolbarAction(selection: string, from: number, to: number, prompt: string) {
-  const rightContainer = getRightContainer();
-  if (!rightContainer) return;
-  const sidePanel = await prepareSidePanel('sidePanelImprove.html');
-
-  sidePanel.querySelector('#copilot-original-content')!.textContent = selection;
-  const regenerateBtn = sidePanel.querySelector(
-    '#btn-copilot-regenerate'
-  ) as HTMLButtonElement;
-  regenerateBtn.onclick = async () => {
-    await generate(selection, sidePanel, prompt);
-  };
-
-  const replaceBtn = sidePanel.querySelector(
-    '#btn-copilot-replace'
-  ) as HTMLButtonElement;
-  replaceBtn.onclick = () => {
-    window.dispatchEvent(
-      new CustomEvent('copilot:editor:replace', {
-        detail: {
-          content: (
-            sidePanel.querySelector('#copilot-gpt-response') as HTMLInputElement
-          ).value,
-          from: from,
-          to: to,
-        },
-      })
-    );
-    document.getElementById('copilot-side-panel')?.remove();
-  };
-
-  rightContainer.appendChild(sidePanel);
-
-  await generate(selection, sidePanel, prompt);
-}
 
 export async function onFindSimilar(selection: string) {
   const rightContainer = getRightContainer();
@@ -78,33 +40,6 @@ function getRightContainer() {
   return document.querySelector(
     '.ide-react-panel[data-panel-id="panel-pdf"]'
   );
-}
-
-async function generate(selection: string, sidePanel: HTMLElement, prompt: string) {
-  const textarea = sidePanel.querySelector(
-    '#copilot-gpt-response'
-  ) as HTMLInputElement;
-  const parent = textarea.parentElement!.parentElement!;
-  const spinner = document.getElementById('copilot-improve-loading-spinner')!
-  parent.style.display = 'none';
-  spinner.style.display = 'block';
-
-  let improvement = ''
-  try {
-    improvement = await GetImprovement(selection, prompt);
-  } catch (error) {
-    const config = await chrome.storage.local.get([LOCAL_STORAGE_KEY_API_KEY]);
-    if (!config[LOCAL_STORAGE_KEY_API_KEY]) {
-      improvement = 'Server is at capacity. Please try again later or use your own OpenAI API key.';
-    } else {
-      improvement = 'An error occurred while generating the content. Please try again later.\nError: ' + error;
-    }
-  }
-
-  textarea.value = improvement;
-  textarea.style.height = `${document.getElementById('copilot-original-content')!.clientHeight}px`;
-  parent.style.display = 'block';
-  spinner.style.display = 'none';
 }
 
 async function findSimilar(selection: string, sidePanel: HTMLElement) {
