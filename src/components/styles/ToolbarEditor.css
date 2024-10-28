@@ -1,0 +1,63 @@
+div#copilot-toolbar-editor {
+  position: absolute;
+  left: 57px;
+  right: 23px;
+  background-color: white;
+  height: 200px;
+  padding: 10px;
+  margin: 0 10px;
+  filter: drop-shadow(0 0 2px black);
+  border-radius: 2px;
+  font-family: Lato, sans-serif;
+  font-size: 14px;
+  ;
+}
+
+
+div#copilot-toolbar-editor div.toolbar-editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+div#copilot-toolbar-editor div.toolbar-editor-container div.toolbar-editor-header {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+div#copilot-toolbar-editor div.toolbar-editor-header a {
+  &:first-child {
+    margin-right: 20px;
+  }
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+
+  &.disabled {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+}
+
+div#copilot-toolbar-editor div.toolbar-editor-header a span {
+  &:first-child {
+    vertical-align: middle;
+  }
+
+  &:last-child {
+    vertical-align: baseline;
+    margin-left: 2px;
+  }
+}
+
+div#copilot-toolbar-editor div.toolbar-editor-container textarea {
+  width: 100%;
+  flex: 1;
+  padding: 10px;
+}
+
+div#copilot-toolbar-editor span.toolbar-editor-header-actions {
+  text-align: right;
+}

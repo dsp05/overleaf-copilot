@@ -75,16 +75,15 @@ div#copilot-improve-loading-spinner {
 div#copilot-toolbar {
   position: absolute;
   display: flex;
-  padding: 2px;
+  padding: 2px 2px 2px 0;
   height: 30px;
   border-radius: 15px;
   z-index: 1000;
   background-color: #eee;
   filter: drop-shadow(0 0 1px black);
-  overflow: hidden;
 }
 
-div#copilot-toolbar div {
+div#copilot-toolbar div.button {
   border-radius: 50%;
   width: 26px;
   height: 26px;
@@ -95,11 +94,7 @@ div#copilot-toolbar div {
   color: white;
 }
 
-div#copilot-toolbar div:first-child {
-  margin-left: 0;
-}
-
-div#copilot-toolbar div:hover {
+div#copilot-toolbar div.button:hover {
   background-color: rgb(24, 86, 52);
   filter: drop-shadow(0 0 0.5px black);
 }

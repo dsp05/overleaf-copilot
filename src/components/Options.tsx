@@ -2,7 +2,6 @@ import { render, Fragment } from 'preact';
 import { useEffect, useState } from 'preact/hooks'
 import 'purecss/build/pure-min.css';
 import { LOCAL_STORAGE_KEY_OPTIONS, MODELS } from '../constants';
-import { icons, Icon } from './Icon';
 import { Options } from '../types';
 import { GetOptions } from '../utils/helper';
 import { IconSelect } from './IconSelect';
@@ -45,9 +44,6 @@ const OptionsForm = () => {
     setState(options);
   }
 
-  const apiKeyPlaceholder = !state.apiKey ? "Enter your API key" :
-    state.apiKey.length <= 6 ? "***" : state.apiKey.substring(0, 3) + '***' + state.apiKey.substring(state.apiKey.length - 3);
-
   const version = chrome.runtime.getManifest().version;
 
   return (
@@ -55,16 +51,24 @@ const OptionsForm = () => {
       <form class="pure-form pure-form-aligned" onSubmit={onSubmit}>
         <fieldset>
           <legend><h1>Options</h1></legend>
-          <p>For any issues or feature requests, visit: <a target="_blank" href="https://github.com/dsp05/overleaf-copilot/issues">https://github.com/dsp05/overleaf-copilot/issues</a></p>
-          <h2>Model</h2>
+          <div class="pure-u-3-4">
+            <p>
+              For any issues or feature requests, visit:
+              <a target="_blank" href="https://github.com/dsp05/overleaf-copilot/issues">https://github.com/dsp05/overleaf-copilot/issues</a>.
+            </p>
+          </div>
           <div class="pure-control-group">
             <label for="field-api-key">OpenAI API key</label>
-            <input class="pure-input-1-4" type="text" id="field-api-key" placeholder={apiKeyPlaceholder}
+            <input class="pure-input-1-4" type="password" id="field-api-key" placeholder="Enter your API key" value={state.apiKey}
               onChange={(e) => onOptionsChange({ ...state, apiKey: e.currentTarget.value })} />
-            <span class="pure-form-message-inline pure-u-1-3">
-              To avoid quota limitations, please use your own API key, as most features require it for full functionality.
-              Your API key will be stored locally and will never be shared.</span>
           </div>
+          <div class="pure-u-3-4">
+            <p>
+              To avoid quota limitations, please use your own API key. Your API key will be stored locally and will never be shared.
+            </p>
+            <p style="color: #8B0000">You need to use your own API key to customize the following options.</p>
+          </div>
+          <h2>Model</h2>
           <div class="pure-control-group">
             <label for="field-api-base-url">API base URL</label>
             <input class="pure-input-1-4" type="text" id="field-api-base-url" placeholder="https://api.openai.com/v1" value={state.apiBaseUrl}

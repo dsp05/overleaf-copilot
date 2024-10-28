@@ -12,6 +12,7 @@ function debounce<T extends () => void>(func: T): () => void {
 
   return function () {
     document.getElementById('copilot-toolbar')?.remove();
+    document.getElementById('copilot-toolbar-editor')?.remove();
     updateSuggestionOnCursorUpdate();
 
     if (timeout) clearTimeout(timeout);
