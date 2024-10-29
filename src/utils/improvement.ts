@@ -4,7 +4,7 @@ import OpenAI from 'openai';
 import {
   DEFAULT_MODEL,
 } from '../constants';
-import { GetOptions, PostProcessResponse } from './helper';
+import { GetOptions, postProcessResponse } from './helper';
 
 const HOSTED_IMPROVE_URL = 'https://embedding.azurewebsites.net/improve';
 
@@ -22,7 +22,7 @@ export async function* getImprovement(selection: string, prompt: string) {
       yield "Server is at capacity. Please select fewer words, try again later or use your own OpenAI API key.";
     }
 
-    yield PostProcessResponse((await response.json())["content"]);
+    yield postProcessResponse((await response.json())["content"]);
   } else {
     const openai = new OpenAI({
       apiKey: options.apiKey,
