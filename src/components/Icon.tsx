@@ -6,7 +6,8 @@ import {
   Save, SearchCheck, Send, CircleX, SpellCheck, SpellCheck2,
   UserRoundCheck, Languages, Globe, BookType, MessageCircleMore,
   ChevronsUp, MessageSquareQuote, MessageCirclePlus, Sigma,
-  X, Infinity, Expand, Shrink, CaseSensitive, Replace, RotateCcw
+  X, Infinity, Expand, Shrink, CaseSensitive, Replace, RotateCcw,
+  Diff, Circle, CircleCheck,
 } from 'lucide-preact';
 
 interface IconProps {
@@ -66,6 +67,9 @@ export const iconsMap: { [key: string]: LucideIcon } = {
   'case-sensitive': CaseSensitive,
   'replace': Replace,
   'rotate-ccw': RotateCcw,
+  'diff': Diff,
+  'circle': Circle,
+  'circle-check': CircleCheck
 }
 
 export const icons = Object.keys(iconsMap).sort();
