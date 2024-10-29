@@ -51,14 +51,22 @@ button#btn-copilot-close {
   float: right;
   margin-top: 7px;
   font-size: 14px;
+
+  &:hover {
+    background-color: #138a07;
+  }
 }
 
 button#btn-copilot-load-more {
   font-size: 12px;
+
+  &:hover {
+    background-color: #138a07;
+  }
 }
 
-div#copilot-similar-content-container {
-  display: none;
+div#copilot-similar-content a {
+  font-weight: bold;
 }
 
 div#copilot-similar-content-loading-spinner {

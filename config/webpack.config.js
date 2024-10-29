@@ -12,8 +12,8 @@ const config = (env, argv) =>
       contentMainScript: PATHS.src + '/main/contentScript.ts',
       contentIsoScript: PATHS.src + '/iso//contentScript.ts',
       background: PATHS.src + '/background.ts',
-      search: PATHS.src + '/search.ts',
       options: PATHS.src + '/components/Options.tsx',
+      similar: PATHS.src + '/components/FindSimilarPage.tsx',
     },
     devtool: argv.mode === 'production' ? false : 'source-map',
     resolve: {

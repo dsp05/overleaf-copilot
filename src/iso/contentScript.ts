@@ -3,9 +3,6 @@
 import './contentScript.css';
 
 import { GetOrLoadSuggestion } from '../utils/suggestion';
-import {
-  LOCAL_STORAGE_KEY_API_KEY,
-} from '../constants';
 import { showToolbar } from './toolbar';
 import { GetOptions } from '../utils/helper';
 import { Options } from '../types';

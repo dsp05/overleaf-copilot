@@ -1,8 +1,8 @@
-import { onFindSimilar } from "./sidePanel";
 import { Options } from "../types";
 import { h, render } from "preact";
 import { ToolbarEditor, ToolbarPosition } from "../components/ToolbarEditor";
 import { Toolbar } from "../components/Toolbar";
+import { FindSimilar } from "../components/FindSimilar";
 
 export function showToolbar(data: {
   selection: string;
@@ -58,4 +58,20 @@ export function showToolbar(data: {
       await onFindSimilar(data.selection);
     }
   }), toolbar);
+}
+
+async function onFindSimilar(selection: string) {
+  const rightContainer = document.querySelector('.ide-react-panel[data-panel-id="panel-pdf"]');
+  if (!rightContainer) return;
+
+  document.getElementById('copilot-side-panel')?.remove();
+  const sidePanel = document.createElement('div');
+  sidePanel.setAttribute('id', 'copilot-side-panel');
+  rightContainer.appendChild(sidePanel);
+
+  render(h(FindSimilar, {
+    selection,
+    onClose: () => document.getElementById('copilot-side-panel')?.remove(),
+    onLoadMore: () => chrome.runtime.sendMessage({ type: 'load-more', payload: { selection } })
+  }), sidePanel);
 }

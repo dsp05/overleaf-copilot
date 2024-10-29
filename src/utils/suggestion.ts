@@ -7,7 +7,7 @@ import {
   DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
   DEFAULT_MODEL,
 } from '../constants';
-import { GetOptions, PostProcessResponse } from './helper';
+import { GetOptions, postProcessResponse } from './helper';
 
 const completionCache = new Map<string, string>();
 const cacheSize = 100;
@@ -36,7 +36,7 @@ async function getSuggestion(input: string, signal: AbortSignal) {
       body: JSON.stringify({ content: input }),
     });
 
-    return PostProcessResponse((await response.json())["content"]);
+    return postProcessResponse((await response.json())["content"]);
   };
 
   const openai = new OpenAI({
@@ -69,7 +69,7 @@ async function getSuggestion(input: string, signal: AbortSignal) {
     }
     throw err;
   }
-  return PostProcessResponse(completion.choices[0].message.content);
+  return postProcessResponse(completion.choices[0].message.content);
 }
 
 function buildSuggestionPrompt(input: string, template: string | undefined) {
