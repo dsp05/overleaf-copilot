@@ -11,11 +11,11 @@ export interface ToolbarProps {
 export const Toolbar = ({ actions, searchDisabled, onClickAction, onClickSearch }: ToolbarProps) => {
   return <Fragment>
     {actions.map(action => {
-      return <div className="button" title={action.name ?? "Rewrite"} onClick={() => onClickAction(action)}>
+      return <div className="copilot-toolbar-button" title={action.name ?? "Rewrite"} onClick={() => onClickAction(action)}>
         <Icon name={action.icon} size={16} />
       </div>
     })}
-    {!searchDisabled && <div className="button search" title="Search" onClick={onClickSearch}>
+    {!searchDisabled && <div className="copilot-toolbar-button copilot-toolbar-search" title="Search" onClick={onClickSearch}>
       <Icon name="search" size={16} />
     </div>}
   </Fragment>
