@@ -91,28 +91,28 @@ div#copilot-toolbar {
   filter: drop-shadow(0 0 1px black);
 }
 
-div#copilot-toolbar div.button {
+div#copilot-toolbar div.copilot-toolbar-button {
   border-radius: 50%;
   width: 26px;
   height: 26px;
   cursor: pointer;
   background-color: rgb(7, 109, 53);
   margin-left: 2px;
-  padding: 5px;
+  padding: 2px 5px 5px 5px;
   color: white;
+
+  &:hover {
+    background-color: rgb(24, 86, 52);
+    filter: drop-shadow(0 0 0.5px black);
+  }
 }
 
-div#copilot-toolbar div.button:hover {
-  background-color: rgb(24, 86, 52);
-  filter: drop-shadow(0 0 0.5px black);
-}
-
-div#copilot-toolbar div.search {
+div#copilot-toolbar div.copilot-toolbar-search {
   background-color: #3265b2;
-}
 
-div#copilot-toolbar div.search:hover {
-  background-color: #295392;
+  &:hover {
+    background-color: #295392;
+  }
 }
 
 div.loading {

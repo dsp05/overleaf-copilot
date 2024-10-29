@@ -13,23 +13,29 @@ export function showToolbar(data: {
   document.getElementById('copilot-toolbar')?.remove();
   document.getElementById('copilot-toolbar-editor')?.remove();
 
-  const scroller = document.querySelector('div.cm-scroller');
-  if (scroller == null) return;
   const cursor = document.querySelector('.cm-cursor-primary') as HTMLElement;
   if (cursor == null) return;
+  const rect = cursor.getBoundingClientRect();
 
   const toolbar = document.createElement('div');
   toolbar.setAttribute('id', 'copilot-toolbar');
-  const position: ToolbarPosition = data.to - data.head < data.head - data.from ? "down" : "up";
+
+  let position: ToolbarPosition;
+  if (rect.top <= 250) position = "down";
+  else if (rect.bottom >= window.innerHeight - 250) position = "up";
+  else position = data.to - data.head < data.head - data.from ? "down" : "up";
+
+  let left = Math.max(0, rect.left - 35);
+  toolbar.style.left = `${left}px`;
+
   if (position == "down") {
-    toolbar.style.left = `${parseInt(cursor.style.left) - 25}px`;
-    toolbar.style.top = `${parseInt(cursor.style.top) + 25}px`;
+    toolbar.style.top = `${rect.top + 25}px`;
   } else {
-    toolbar.style.left = `${parseInt(cursor.style.left) - 35}px`;
-    toolbar.style.top = `${parseInt(cursor.style.top) - 30}px`;
+    toolbar.style.top = `${rect.top - 35}px`;
   }
 
-  scroller.appendChild(toolbar);
+  document.body.appendChild(toolbar);
+
   render(h(Toolbar, {
     actions: options.toolbarActions ?? [],
     searchDisabled: !!options.toolbarSearchDisabled,
@@ -37,10 +43,6 @@ export function showToolbar(data: {
       const toolbar = document.getElementById('copilot-toolbar');
       if (toolbar == null)
         return;
-
-      const scroller = document.querySelector('div.cm-scroller');
-      if (scroller == null) return;
-
       document.getElementById('copilot-toolbar-editor')?.remove();
 
       const toolbarEditor = document.createElement('div');
@@ -51,7 +53,16 @@ export function showToolbar(data: {
       else
         toolbarEditor.style.top = `${parseInt(toolbar.style.top) - 205}px`;
 
-      scroller.appendChild(toolbarEditor);
+      const scroller = document.querySelector('div.cm-scroller');
+      let width = scroller?.getBoundingClientRect().width ?? 400;
+      width = Math.min(Math.max(width, 400), 800);
+      toolbarEditor.style.width = `${width}px`;
+
+      const rect = toolbar.getBoundingClientRect();
+      let left = Math.max(parseInt(toolbar.style.left) - (width - rect.width) / 2, 0);
+      toolbarEditor.style.left = `${left}px`;
+
+      document.body.appendChild(toolbarEditor);
       render(h(ToolbarEditor, { action, data }), toolbarEditor);
     },
     onClickSearch: async () => {

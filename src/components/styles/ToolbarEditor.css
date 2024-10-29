@@ -10,7 +10,7 @@ div#copilot-toolbar-editor {
   border-radius: 2px;
   font-family: Lato, sans-serif;
   font-size: 14px;
-  ;
+  z-index: 1000;
 }
 
 
