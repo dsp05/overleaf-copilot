@@ -25,8 +25,8 @@ div#copilot-toolbar-editor div.toolbar-editor-container div.toolbar-editor-heade
   font-weight: bold;
 }
 
-div#copilot-toolbar-editor div.toolbar-editor-header a {
-  &:first-child {
+div#copilot-toolbar-editor div.toolbar-editor-header .toolbar-editor-action {
+  &:not(:last-child) {
     margin-right: 20px;
   }
 
@@ -52,10 +52,31 @@ div#copilot-toolbar-editor div.toolbar-editor-header a span {
   }
 }
 
-div#copilot-toolbar-editor div.toolbar-editor-container textarea {
-  width: 100%;
-  flex: 1;
-  padding: 10px;
+div#copilot-toolbar-editor div.toolbar-editor-container {
+
+  textarea {
+    width: 100%;
+    flex: 1;
+    padding: 10px;
+  }
+
+  .toolbar-editor-diff-view {
+    white-space: pre-wrap;
+    width: 100%;
+    flex: 1;
+    padding: 10px;
+    border: solid 1px #ccc;
+    border-radius: 2px;
+    overflow-y: scroll;
+
+    .toolbar-editor-diff-added {
+      color: green;
+    }
+
+    .toolbar-editor-diff-removed {
+      color: red;
+    }
+  }
 }
 
 div#copilot-toolbar-editor span.toolbar-editor-header-actions {
