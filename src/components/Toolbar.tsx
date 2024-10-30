@@ -21,16 +21,12 @@ export const Toolbar = ({ data, actions, searchDisabled, onShowEditor, onClickSe
   const onClick = async (action: ToolbarAction) => {
     if (loading) return;
 
-    if (action.onClick === "show_editor") {
-      onShowEditor(action);
-    } else {
+    if (action.onClick === "replace") {
       setLoading(true);
-
       const content = await getImprovement(data.selection, action.prompt, options, signal);
       setLoading(false);
 
       if (signal.aborted) return;
-
       window.dispatchEvent(
         new CustomEvent('copilot:editor:replace', {
           detail: {
@@ -41,6 +37,8 @@ export const Toolbar = ({ data, actions, searchDisabled, onShowEditor, onClickSe
         })
       );
       setLoading(false);
+    } else {
+      onShowEditor(action);
     }
   }
 
