@@ -95,7 +95,7 @@ export class Suggestion {
 
     if (!hasError) {
       this.status = 'completed';
-      this.textColor = '#777';
+      this.textColor = '#666';
     }
   }
 

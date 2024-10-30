@@ -1,7 +1,6 @@
 'use strict';
 
 import OpenAI, { APIUserAbortError } from 'openai';
-import { ChatCompletion } from 'openai/resources/chat';
 import {
   DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
   DEFAULT_MODEL,
@@ -15,15 +14,19 @@ export async function* getSuggestion(input: string, signal: AbortSignal, options
   AsyncGenerator<StreamChunk, void, unknown> {
 
   if (!options.apiKey) {
-    const response = await fetch(HOSTED_COMPLETE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: input }),
-      signal: signal,
-    });
+    try {
+      const response = await fetch(HOSTED_COMPLETE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: input }),
+        signal: signal,
+      });
 
-    yield { kind: "token", content: postProcessResponse((await response.json())["content"]) };
-    return;
+      yield { kind: "token", content: postProcessResponse((await response.json())["content"]) };
+      return;
+    } catch (AbortError) {
+      return;
+    }
   };
 
   const openai = new OpenAI({

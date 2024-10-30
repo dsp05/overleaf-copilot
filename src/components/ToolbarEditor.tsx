@@ -4,14 +4,16 @@ import "./styles/ToolbarEditor.css";
 import 'purecss/build/pure-min.css';
 import { getImprovement } from "../utils/improvement";
 import * as Diff from 'diff';
+import { Options } from "../types";
 
 interface ToolbarEditorProps {
   data: { selection: string, from: number, to: number }
   action: { name: string, prompt: string, icon: string },
+  options: Options,
+  signal: AbortSignal
 }
 
-
-export const ToolbarEditor = ({ data, action }: ToolbarEditorProps) => {
+export const ToolbarEditor = ({ data, action, signal, options }: ToolbarEditorProps) => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
   const [showDiff, setShowDiff] = useState(false);
@@ -29,7 +31,7 @@ export const ToolbarEditor = ({ data, action }: ToolbarEditorProps) => {
     setShowDiff(false);
     setContent("");
     setLoading(true);
-    const stream = getImprovement(data.selection, action.prompt);
+    const stream = getImprovement(data.selection, action.prompt, options, signal);
     for await (const chunk of stream) {
       setContent((prev) => prev + chunk.content);
     }

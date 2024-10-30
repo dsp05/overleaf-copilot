@@ -1,7 +1,7 @@
 div#copilot-suggestion-content {
   white-space: break-spaces;
   position: absolute;
-  color: #999;
+  color: #aaa;
   font-style: italic;
   z-index: 1;
   font-size: 12px;

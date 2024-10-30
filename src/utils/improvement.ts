@@ -1,37 +1,41 @@
 'use strict';
 
-import OpenAI from 'openai';
+import OpenAI, { APIUserAbortError } from 'openai';
 import {
   DEFAULT_MODEL,
 } from '../constants';
-import { getOptions, postProcessResponse } from './helper';
-import { StreamChunk } from '../types';
+import { postProcessResponse } from './helper';
+import { Options, StreamChunk } from '../types';
 
 const HOSTED_IMPROVE_URL = 'https://embedding.azurewebsites.net/improve';
 
-export async function* getImprovement(selection: string, prompt: string):
+export async function* getImprovement(selection: string, prompt: string, options: Options, signal: AbortSignal):
   AsyncGenerator<StreamChunk, void, unknown> {
-  const options = await getOptions();
 
   if (!options.apiKey) {
-    const response = await fetch(HOSTED_IMPROVE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: selection }),
-    });
+    try {
+      const response = await fetch(HOSTED_IMPROVE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: selection }),
+        signal: signal,
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
+        yield {
+          kind: "error",
+          content: "Server is at capacity. Please select fewer words, try again later or use your own OpenAI API key."
+        };
+        return;
+      }
+
       yield {
-        kind: "error",
-        content: "Server is at capacity. Please select fewer words, try again later or use your own OpenAI API key."
+        kind: "token",
+        content: postProcessResponse((await response.json())["content"])
       };
+    } catch (AbortError) {
       return;
     }
-
-    yield {
-      kind: "token",
-      content: postProcessResponse((await response.json())["content"])
-    };
   } else {
     const openai = new OpenAI({
       apiKey: options.apiKey,
@@ -49,13 +53,16 @@ export async function* getImprovement(selection: string, prompt: string):
         ],
         model: options.model || DEFAULT_MODEL,
         stream: true,
-      });
+      }, { signal: signal });
 
       for await (const chunk of stream) {
         yield { kind: "token", content: chunk.choices[0]?.delta?.content || '' };
       }
 
     } catch (error) {
+      if (error instanceof APIUserAbortError) {
+        return;
+      }
       yield { kind: "error", content: "An error occurred while generating the content.\n" + error };
     }
   }

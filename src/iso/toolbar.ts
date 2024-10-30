@@ -9,7 +9,7 @@ export function showToolbar(data: {
   from: number;
   to: number;
   head: number;
-}, options: Options) {
+}, options: Options, signal: AbortSignal) {
   document.getElementById('copilot-toolbar')?.remove();
   document.getElementById('copilot-toolbar-editor')?.remove();
 
@@ -63,7 +63,7 @@ export function showToolbar(data: {
       toolbarEditor.style.left = `${left}px`;
 
       document.body.appendChild(toolbarEditor);
-      render(h(ToolbarEditor, { action, data }), toolbarEditor);
+      render(h(ToolbarEditor, { action, data, options, signal }), toolbarEditor);
     },
     onClickSearch: async () => {
       await onFindSimilar(data.selection);
