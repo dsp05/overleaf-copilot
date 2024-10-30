@@ -2,84 +2,38 @@
 
 import './contentScript.css';
 
-import { GetOrLoadSuggestion } from '../utils/suggestion';
 import { showToolbar } from './toolbar';
-import { GetOptions } from '../utils/helper';
 import { Options } from '../types';
-import { createNewSuggestion } from './helpers';
-import { getCurrentSuggestion } from '../common/helpers';
+import { Suggestion } from '../common/suggestion';
+import { getOptions } from '../utils/helper';
 
 let options: Options | undefined = undefined;
-
-function debounce<
-  T extends (
-    content: string,
-    pos: number,
-    row: number,
-    col: number,
-    signal: AbortSignal
-  ) => Promise<void>
->(func: T): EventListener {
-  let controller: AbortController | null = null;
-
-  return async function (event: Event) {
-    if (controller) controller.abort();
-    if (options == undefined || options.suggestionDisabled) return;
-
-    controller = new AbortController();
-    const detail = (
-      event as CustomEvent<{
-        prefix: string;
-        pos: number;
-        row: number;
-        col: number;
-      }>
-    ).detail;
-    await func(
-      detail.prefix,
-      detail.pos,
-      detail.row,
-      detail.col,
-      controller.signal
-    );
-  };
-}
+let suggestionAbortController: AbortController | null = null;
 
 async function onEditorUpdate(
-  content: string,
-  pos: number,
-  row: number,
-  col: number,
-  signal: AbortSignal
+  event: CustomEvent<{
+    prefix: string,
+    pos: number,
+    row: number,
+    col: number
+  }>
 ) {
-  if (options == undefined || options.suggestionDisabled) return;
+  suggestionAbortController?.abort();
 
-  const existing = getCurrentSuggestion();
+  if (options == undefined || options.suggestionDisabled) return;
+  suggestionAbortController = new AbortController();
+
+  const existing = Suggestion.getCurrent();
   if (!!existing) return;
 
-  const suggestion = createNewSuggestion('...', pos);
-  if (!suggestion) return;
-
-  let completion = '';
-
   try {
-    completion = await GetOrLoadSuggestion(content, signal);
-  } catch (error) {
-    if (!options.apiKey) {
-      completion = 'Server is at capacity. Please try again later or use your own OpenAI API key.';
-    } else {
-      completion = 'An error occurred while generating the content. ' + error;
-    }
-
-    suggestion.toError(completion);
-    return;
+    await Suggestion.create(event.detail.pos)?.generate(event.detail.prefix, suggestionAbortController.signal, options);
+  } catch (AbortError) {
   }
-
-  suggestion.toCompleted(completion);
 }
 
 async function onOptionsUpdate() {
-  options = await GetOptions();
+  options = await getOptions();
   window.dispatchEvent(
     new CustomEvent('copilot:options:update', { detail: { options } })
   );
@@ -97,8 +51,12 @@ async function onEditorSelect(
   showToolbar(event.detail, options);
 }
 
-window.addEventListener('copilot:editor:update', debounce(onEditorUpdate));
-window.addEventListener('copilot:editor:select', onEditorSelect as any as EventListener);
+function onCursorUpdate(_: Event) {
+  suggestionAbortController?.abort();
+}
 
+window.addEventListener('copilot:editor:update', onEditorUpdate as any as EventListener);
+window.addEventListener('copilot:editor:select', onEditorSelect as any as EventListener);
+window.addEventListener('copilot:cursor:update', onCursorUpdate);
 chrome.storage.onChanged.addListener(onOptionsUpdate);
 onOptionsUpdate();

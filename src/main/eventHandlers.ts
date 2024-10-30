@@ -1,24 +1,26 @@
 import * as Diff from 'diff';
-import { getCurrentEditorContent } from './helpers';
-import { getCurrentSuggestion } from '../common/helpers';
+import { getCmView } from './helpers';
+import { Suggestion } from '../common/suggestion';
 
 export function onAcceptSuggestion() {
-  const suggestion = getCurrentSuggestion();
+  const suggestion = Suggestion.getCurrent();
   if (suggestion?.status !== 'completed') {
     suggestion?.remove();
     return;
   }
 
-  const content = getCurrentEditorContent();
-  const currentPos = content.cmView.view.state.selection.main.head;
-  const changes = { from: suggestion.pos, to: currentPos, insert: suggestion.text };
-  content.cmView.view.dispatch({ changes });
-
+  const view = getCmView();
+  const changes = {
+    from: suggestion.pos,
+    to: view.state.selection.main.head,
+    insert: suggestion.text
+  };
+  view.dispatch({ changes });
   suggestion.remove();
 }
 
 export function onAcceptPartialSuggestion() {
-  const suggestion = getCurrentSuggestion();
+  const suggestion = Suggestion.getCurrent();
   if (suggestion?.status !== 'completed') return;
 
   const pos = suggestion.pos;
@@ -36,17 +38,16 @@ export function onAcceptPartialSuggestion() {
   }
   const accepted = text.substring(0, acceptedLength);
   const changes = { from: pos, to: pos, insert: accepted };
-  const content = getCurrentEditorContent();
+  const view = getCmView();
   suggestion.toPartialAccepted(acceptedLength);
-  content.cmView.view.dispatch({ changes: changes, selection: { anchor: pos + acceptedLength } });
+  view.dispatch({ changes: changes, selection: { anchor: pos + acceptedLength } });
 }
 
 export function onReplaceContent(
   e: CustomEvent<{ content: string; from: number; to: number }>
 ) {
-  var editor = getCurrentEditorContent();
-  if (!editor) return;
-  const state = editor.cmView.view.state;
+  var view = getCmView();
+  const state = view.state;
   if (
     state.selection.main.from == e.detail.from &&
     state.selection.main.to == e.detail.to
@@ -90,6 +91,6 @@ export function onReplaceContent(
     }
 
     const selection = { anchor: e.detail.from + e.detail.content.length };
-    editor.cmView.view.dispatch({ changes, selection });
+    view.dispatch({ changes, selection });
   }
 }

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'preact/hooks'
 import 'purecss/build/pure-min.css';
 import { LOCAL_STORAGE_KEY_OPTIONS, MODELS } from '../constants';
 import { Options } from '../types';
-import { GetOptions } from '../utils/helper';
+import { getOptions } from '../utils/helper';
 import { IconSelect } from './IconSelect';
 
 const OptionsForm = () => {
@@ -11,7 +11,7 @@ const OptionsForm = () => {
   const [message, setMessage] = useState<string>();
 
   useEffect(() => {
-    GetOptions().then((options) => {
+    getOptions().then((options) => {
       onOptionsChange(options);
     });
   }, []);

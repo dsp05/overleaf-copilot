@@ -1,42 +1,29 @@
 'use strict';
 
 import OpenAI, { APIUserAbortError } from 'openai';
-import crypto from 'crypto-js';
 import { ChatCompletion } from 'openai/resources/chat';
 import {
   DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
   DEFAULT_MODEL,
 } from '../constants';
-import { GetOptions, postProcessResponse } from './helper';
+import { postProcessResponse } from './helper';
+import { Options, StreamChunk } from '../types';
 
-const completionCache = new Map<string, string>();
-const cacheSize = 100;
 const HOSTED_COMPLETE_URL = 'https://embedding.azurewebsites.net/complete';
 
-export async function GetOrLoadSuggestion(input: string, signal: AbortSignal) {
-  const key = `completion-${computeMD5Hash(input)}`;
-  if (completionCache.has(key)) {
-    return completionCache.get(key) ?? '';
-  }
-
-  const completion = await getSuggestion(input, signal);
-
-  if (completionCache.size >= cacheSize) completionCache.clear();
-  completionCache.set(key, completion);
-  return completion;
-}
-
-async function getSuggestion(input: string, signal: AbortSignal) {
-  const options = await GetOptions();
+export async function* getSuggestion(input: string, signal: AbortSignal, options: Options):
+  AsyncGenerator<StreamChunk, void, unknown> {
 
   if (!options.apiKey) {
     const response = await fetch(HOSTED_COMPLETE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content: input }),
+      signal: signal,
     });
 
-    return postProcessResponse((await response.json())["content"]);
+    yield { kind: "token", content: postProcessResponse((await response.json())["content"]) };
+    return;
   };
 
   const openai = new OpenAI({
@@ -45,9 +32,8 @@ async function getSuggestion(input: string, signal: AbortSignal) {
     dangerouslyAllowBrowser: true,
   });
 
-  let completion: ChatCompletion | null = null;
   try {
-    completion = await openai.chat.completions.create(
+    const stream = await openai.chat.completions.create(
       {
         messages: [
           {
@@ -60,16 +46,20 @@ async function getSuggestion(input: string, signal: AbortSignal) {
         ],
         model: options.model ?? DEFAULT_MODEL,
         max_tokens: options.suggestionMaxOutputToken ?? DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
+        stream: true,
       },
       { signal: signal }
     );
-  } catch (err) {
-    if (err instanceof APIUserAbortError) {
-      return '';
+
+    for await (const chunk of stream) {
+      yield { kind: "token", content: chunk.choices[0]?.delta?.content || '' };
     }
-    throw err;
+  } catch (error) {
+    if (error instanceof APIUserAbortError) {
+      return;
+    }
+    yield { kind: "error", content: "An error occurred while generating the content.\n" + error };
   }
-  return postProcessResponse(completion.choices[0].message.content);
 }
 
 function buildSuggestionPrompt(input: string, template: string | undefined) {
@@ -87,8 +77,4 @@ function buildSuggestionPrompt(input: string, template: string | undefined) {
     `${input}\n` +
     `### End of the paper ###`
   );
-}
-
-function computeMD5Hash(input: string) {
-  return crypto.MD5(input).toString();
 }

@@ -1,16 +1,17 @@
 import { EditorContent } from "../types";
-import { getCurrentSuggestion } from "../common/helpers";
+import { Suggestion } from "../common/suggestion";
 
-export function getCurrentEditorContent() {
-  return document.querySelector('.cm-content') as any as EditorContent;
+export function getCmView() {
+  const editor = document.querySelector('.cm-content') as any as EditorContent;
+  return editor.cmView.view;
 }
 
 export function updateSuggestionOnCursorUpdate() {
-  const suggestion = getCurrentSuggestion();
+  const suggestion = Suggestion.getCurrent();
   if (!suggestion) return;
 
-  const content = getCurrentEditorContent();
-  const currentPos = content.cmView.view.state.selection.main.head;
+  const view = getCmView()
+  const currentPos = view.state.selection.main.head;
 
   if (currentPos === suggestion.pos && suggestion.status === 'partial-accepted'
     && suggestion.toCompletedFromPartialAccepted())

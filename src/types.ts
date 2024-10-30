@@ -39,3 +39,7 @@ export interface Options {
   toolbarSearchDisabled?: boolean;
   toolbarDisabled?: boolean;
 }
+export interface StreamChunk {
+  kind: "token" | "error",
+  content: string
+}
