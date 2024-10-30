@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { Icon } from "./Icon";
 import "./styles/ToolbarEditor.css";
 import 'purecss/build/pure-min.css';
@@ -18,6 +18,7 @@ export const ToolbarEditor = ({ data, action, signal, options }: ToolbarEditorPr
   const [content, setContent] = useState("");
   const [showDiff, setShowDiff] = useState(false);
   const [diffs, setDiffs] = useState<Diff.Change[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -34,6 +35,7 @@ export const ToolbarEditor = ({ data, action, signal, options }: ToolbarEditorPr
     const stream = getImprovement(data.selection, action.prompt, options, signal);
     for await (const chunk of stream) {
       setContent((prev) => prev + chunk.content);
+      textareaRef.current?.scrollTo(0, textareaRef.current.scrollHeight);
     }
     setLoading(false);
   }
@@ -94,7 +96,7 @@ export const ToolbarEditor = ({ data, action, signal, options }: ToolbarEditorPr
           }
         })}
       </div> :
-      <textarea disabled={loading} placeholder={"Generating..."} onChange={(e) => setContent((e.target as HTMLTextAreaElement).value)}>{content}</textarea>}
+      <textarea ref={textareaRef} disabled={loading} placeholder={"Generating..."} onChange={(e) => setContent((e.target as HTMLTextAreaElement).value)}>{content}</textarea>}
   </div >
 }
 
