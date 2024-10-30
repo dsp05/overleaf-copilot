@@ -25,6 +25,13 @@ export interface EditorContent {
   };
 }
 
+export interface ToolbarAction {
+  name: string,
+  prompt: string,
+  icon: string,
+  onClick: "replace" | "show_editor",
+}
+
 export interface Options {
   apiKey?: string;
   apiBaseUrl?: string;
@@ -35,11 +42,18 @@ export interface Options {
   suggestionPrompt?: string;
   suggestionDisabled?: boolean;
 
-  toolbarActions?: { name: string, prompt: string, icon: string }[];
+  toolbarActions?: ToolbarAction[];
   toolbarSearchDisabled?: boolean;
   toolbarDisabled?: boolean;
 }
 export interface StreamChunk {
   kind: "token" | "error",
   content: string
+}
+
+export interface EditorSelectionData {
+  selection: string;
+  from: number;
+  to: number;
+  head: number;
 }

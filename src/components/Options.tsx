@@ -24,7 +24,7 @@ const OptionsForm = () => {
 
   const onAddAction = () => {
     const toolbarActions = state.toolbarActions ?? [];
-    toolbarActions.push({ name: '', prompt: '', icon: '' });
+    toolbarActions.push({ name: '', prompt: '', icon: '', onClick: 'show_editor' });
     onOptionsChange({ ...state, toolbarActions });
   };
 
@@ -145,6 +145,20 @@ const OptionsForm = () => {
                     }} />
                   </div>
                   <span class="pure-form-message-inline pure-u-1-3">Choose an icon for this action in the toolbar.</span>
+                </div>
+                <div class="pure-control-group">
+                  <label for={"field-on-click" + index}>On Click</label>
+                  <select id={"field-on-click" + index} class="pure-input-1-4" style={{ padding: "0 5px" }} value={action.onClick ?? "show_editor"}
+                    onChange={(e) => {
+                      const toolbarActions = state.toolbarActions;
+                      if (!toolbarActions) return;
+                      toolbarActions[index].onClick = e.currentTarget.value as any;
+                      onOptionsChange({ ...state, toolbarActions });
+                    }} >
+                    <option value="show_editor">Show editor</option>
+                    <option value="replace">Replace</option>
+                  </select>
+                  <span class="pure-form-message-inline pure-u-1-3">Choose the action for clicking the icon: either show the editor or directly replace the content</span>
                 </div>
                 <div class="pure-control-group">
                   <label for={"field-suggestion-prompt" + index}>Prompt</label>

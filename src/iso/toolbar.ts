@@ -1,15 +1,10 @@
-import { Options } from "../types";
+import { EditorSelectionData, Options } from "../types";
 import { h, render } from "preact";
 import { ToolbarEditor, ToolbarPosition } from "../components/ToolbarEditor";
 import { Toolbar } from "../components/Toolbar";
 import { FindSimilar } from "../components/FindSimilar";
 
-export function showToolbar(data: {
-  selection: string;
-  from: number;
-  to: number;
-  head: number;
-}, options: Options, signal: AbortSignal) {
+export function showToolbar(data: EditorSelectionData, options: Options, signal: AbortSignal) {
   document.getElementById('copilot-toolbar')?.remove();
   document.getElementById('copilot-toolbar-editor')?.remove();
 
@@ -37,9 +32,12 @@ export function showToolbar(data: {
   document.body.appendChild(toolbar);
 
   render(h(Toolbar, {
+    options,
+    signal,
+    data: data,
     actions: options.toolbarActions ?? [],
     searchDisabled: !!options.toolbarSearchDisabled,
-    onClickAction: (action) => {
+    onShowEditor: (action) => {
       const toolbar = document.getElementById('copilot-toolbar');
       if (toolbar == null)
         return;

@@ -80,41 +80,6 @@ div#copilot-improve-loading-spinner {
   margin-top: 50px;
 }
 
-div#copilot-toolbar {
-  position: absolute;
-  display: flex;
-  padding: 2px 2px 2px 0;
-  height: 30px;
-  border-radius: 15px;
-  z-index: 1000;
-  background-color: #eee;
-  filter: drop-shadow(0 0 1px black);
-}
-
-div#copilot-toolbar div.copilot-toolbar-button {
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  cursor: pointer;
-  background-color: rgb(7, 109, 53);
-  margin-left: 2px;
-  padding: 2px 5px 5px 5px;
-  color: white;
-
-  &:hover {
-    background-color: rgb(24, 86, 52);
-    filter: drop-shadow(0 0 0.5px black);
-  }
-}
-
-div#copilot-toolbar div.copilot-toolbar-search {
-  background-color: #3265b2;
-
-  &:hover {
-    background-color: #295392;
-  }
-}
-
 div.loading {
   width: 24px;
   height: 24px;
