@@ -30,8 +30,8 @@ export const ToolbarEditor = ({ data, action }: ToolbarEditorProps) => {
     setContent("");
     setLoading(true);
     const stream = getImprovement(data.selection, action.prompt);
-    for await (const token of stream) {
-      setContent((prev) => prev + token);
+    for await (const chunk of stream) {
+      setContent((prev) => prev + chunk.content);
     }
     setLoading(false);
   }

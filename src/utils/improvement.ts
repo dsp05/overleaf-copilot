@@ -4,12 +4,14 @@ import OpenAI from 'openai';
 import {
   DEFAULT_MODEL,
 } from '../constants';
-import { GetOptions, postProcessResponse } from './helper';
+import { getOptions, postProcessResponse } from './helper';
+import { StreamChunk } from '../types';
 
 const HOSTED_IMPROVE_URL = 'https://embedding.azurewebsites.net/improve';
 
-export async function* getImprovement(selection: string, prompt: string) {
-  const options = await GetOptions();
+export async function* getImprovement(selection: string, prompt: string):
+  AsyncGenerator<StreamChunk, void, unknown> {
+  const options = await getOptions();
 
   if (!options.apiKey) {
     const response = await fetch(HOSTED_IMPROVE_URL, {
@@ -19,10 +21,17 @@ export async function* getImprovement(selection: string, prompt: string) {
     });
 
     if (!response.ok) {
-      yield "Server is at capacity. Please select fewer words, try again later or use your own OpenAI API key.";
+      yield {
+        kind: "error",
+        content: "Server is at capacity. Please select fewer words, try again later or use your own OpenAI API key."
+      };
+      return;
     }
 
-    yield postProcessResponse((await response.json())["content"]);
+    yield {
+      kind: "token",
+      content: postProcessResponse((await response.json())["content"])
+    };
   } else {
     const openai = new OpenAI({
       apiKey: options.apiKey,
@@ -43,11 +52,11 @@ export async function* getImprovement(selection: string, prompt: string) {
       });
 
       for await (const chunk of stream) {
-        yield chunk.choices[0]?.delta?.content || ''
+        yield { kind: "token", content: chunk.choices[0]?.delta?.content || '' };
       }
 
     } catch (error) {
-      yield "An error occurred while generating the content.\n" + error;
+      yield { kind: "error", content: "An error occurred while generating the content.\n" + error };
     }
   }
 }

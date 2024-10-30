@@ -1,6 +1,50 @@
+import { Options } from "../types";
+import { getSuggestion } from "../utils/suggestion";
+
 // A class to represent a suggestion in the editor
 export class Suggestion {
-  public constructor(private dom: HTMLElement) { }
+  private constructor(private dom: HTMLElement) { }
+
+  public static getCurrent() {
+    const dom = document.getElementById('copilot-suggestion');
+    if (!dom) return null;
+    return new Suggestion(dom);
+  }
+
+  public static create(pos: number) {
+    const scroller = document.querySelector('div.cm-scroller') as HTMLElement;
+    const editor = scroller?.querySelector('div.cm-content') as HTMLElement;
+    const cursor = document.querySelector('.cm-cursor-primary') as HTMLElement;
+    if (scroller == null || editor == null || cursor == null) return null;
+
+    const textNode = document.createTextNode("...");
+    const content = document.createElement('div');
+    content.setAttribute('id', 'copilot-suggestion-content');
+    content.appendChild(textNode);
+
+    const editorRect = editor.getBoundingClientRect();
+    content.style.width = `${editorRect.width}px`;
+    content.style.top = cursor.style.top;
+    content.style.textIndent = `${parseInt(cursor.style.left) - 60}px`;
+
+    const bg = document.createElement('div');
+    bg.setAttribute('id', 'copilot-suggestion-background');
+    content.appendChild(bg);
+    content.onclick = () =>
+      document.getElementById('copilot-suggestion')?.remove();
+
+    const dom = document.createElement('div');
+    dom.setAttribute('class', 'cm-layer');
+    dom.setAttribute('id', 'copilot-suggestion');
+    dom.appendChild(content);
+    scroller.appendChild(dom);
+
+    const suggestion = new Suggestion(dom);
+    suggestion.pos = pos;
+    suggestion.status = 'generating';
+
+    return suggestion;
+  }
 
   public get pos() {
     return parseInt(this.dom.getAttribute('data-pos')!);
@@ -22,15 +66,37 @@ export class Suggestion {
     return this.dom.firstChild!.firstChild!.textContent!;
   }
 
-  public toCompleted(text: string) {
-    this.status = 'completed';
-    this.text = text;
+  private set text(text: string) {
+    this.dom.firstChild!.firstChild!.textContent = text;
   }
 
-  public toError(text: string) {
-    this.status = 'error';
-    this.text = text;
-    document.getElementById('copilot-suggestion-content')!.style.color = 'red';
+  private set textColor(color: string) {
+    (this.dom.firstChild! as HTMLDivElement).style.color = color
+  }
+
+  public async generate(content: string, signal: AbortSignal, options: Options) {
+    let hasError = false;
+    let firstToken = true;
+    for await (const chunk of getSuggestion(content, signal, options)) {
+      if (chunk.kind === "token") {
+        if (firstToken) {
+          this.text = chunk.content;
+          firstToken = false;
+        }
+        else this.text = this.text + chunk.content;
+      } else {
+        this.status = 'error';
+        this.text = this.text + chunk.content;
+        hasError = true;
+        this.textColor = 'red';
+        break;
+      }
+    }
+
+    if (!hasError) {
+      this.status = 'completed';
+      this.textColor = '#777';
+    }
   }
 
   public toPartialAccepted(length: number) {
@@ -63,10 +129,6 @@ export class Suggestion {
 
   public remove() {
     this.dom.remove();
-  }
-
-  private set text(text: string) {
-    this.dom.firstChild!.firstChild!.textContent = text;
   }
 }
 

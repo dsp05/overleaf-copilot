@@ -1,22 +1,22 @@
 div#copilot-suggestion-content {
   white-space: break-spaces;
   position: absolute;
-  color: #777;
+  color: #999;
   font-style: italic;
   z-index: 1;
   font-size: 12px;
   line-height: 20px;
   left: 62px;
-}
 
-div#copilot-suggestion-content div#copilot-suggestion-background {
-  position: absolute;
-  left: -5px;
-  right: 0px;
-  top: 19px;
-  bottom: 1px;
-  background-color: rgb(240, 240, 240);
-  z-index: -1;
+  div#copilot-suggestion-background {
+    position: absolute;
+    left: -5px;
+    right: 0px;
+    top: 19px;
+    bottom: 1px;
+    background-color: rgb(240, 240, 240);
+    z-index: -1;
+  }
 }
 
 div#copilot-side-panel {

@@ -2,8 +2,8 @@
 
 import { Options } from '../types';
 import { DEFAULT_SUGGESTION_MAX_WORDS } from '../constants';
-import { getCurrentEditorContent, updateSuggestionOnCursorUpdate } from './helpers';
-import { onAcceptPartialSuggestion, onAcceptSuggestion, onReplaceContent } from './handlers';
+import { getCmView, updateSuggestionOnCursorUpdate } from './helpers';
+import { onAcceptPartialSuggestion, onAcceptSuggestion, onReplaceContent } from './eventHandlers';
 
 let options: Options | undefined = undefined;
 
@@ -11,6 +11,7 @@ function debounce<T extends () => void>(func: T): () => void {
   let timeout: NodeJS.Timeout | null;
 
   return function () {
+    window.dispatchEvent(new CustomEvent('copilot:cursor:update'));
     document.getElementById('copilot-toolbar')?.remove();
     document.getElementById('copilot-toolbar-editor')?.remove();
     updateSuggestionOnCursorUpdate();
@@ -37,10 +38,8 @@ function onCursorUpdate() {
 
   const maxPromptWords = options.suggestionPromptMaxWords || DEFAULT_SUGGESTION_MAX_WORDS;;
 
-  var editor = getCurrentEditorContent();
-  if (!editor) return;
-
-  const state = editor.cmView.view.state;
+  var view = getCmView();
+  const state = view.state;
 
   if (state.selection.main.from != state.selection.main.to) {
     // Selection is not empty. Show the toolbar;

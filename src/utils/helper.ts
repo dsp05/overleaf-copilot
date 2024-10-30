@@ -24,7 +24,7 @@ export function postProcessResponse(response: string | null) {
   return result;
 }
 
-export async function GetOptions() {
+export async function getOptions() {
   const data = await chrome.storage.local.get([LOCAL_STORAGE_KEY_OPTIONS, LOCAL_STORAGE_KEY_API_KEY, LOCAL_STORAGE_KEY_BASE_URL, LOCAL_STORAGE_KEY_MODEL]);
   const options = (data[LOCAL_STORAGE_KEY_OPTIONS] ?? {}) as Options;
   const toolbarActions = options.toolbarActions ?? [];
