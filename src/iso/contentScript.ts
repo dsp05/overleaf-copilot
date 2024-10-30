@@ -9,6 +9,7 @@ import { getOptions } from '../utils/helper';
 
 let options: Options | undefined = undefined;
 let suggestionAbortController: AbortController | null = null;
+let toolbarActionAbortController: AbortController | null = null;
 
 async function onEditorUpdate(
   event: CustomEvent<{
@@ -26,10 +27,7 @@ async function onEditorUpdate(
   const existing = Suggestion.getCurrent();
   if (!!existing) return;
 
-  try {
-    await Suggestion.create(event.detail.pos)?.generate(event.detail.prefix, suggestionAbortController.signal, options);
-  } catch (AbortError) {
-  }
+  await Suggestion.create(event.detail.pos)?.generate(event.detail.prefix, suggestionAbortController.signal, options);
 }
 
 async function onOptionsUpdate() {
@@ -47,12 +45,16 @@ async function onEditorSelect(
     head: number;
   }>
 ) {
+  toolbarActionAbortController?.abort();
+
   if (options == undefined || options.toolbarDisabled) return;
-  showToolbar(event.detail, options);
+  toolbarActionAbortController = new AbortController();
+  showToolbar(event.detail, options, toolbarActionAbortController.signal);
 }
 
 function onCursorUpdate(_: Event) {
   suggestionAbortController?.abort();
+  toolbarActionAbortController?.abort();
 }
 
 window.addEventListener('copilot:editor:update', onEditorUpdate as any as EventListener);

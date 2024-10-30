@@ -1,21 +1,24 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { Icon } from "./Icon";
 import "./styles/ToolbarEditor.css";
 import 'purecss/build/pure-min.css';
 import { getImprovement } from "../utils/improvement";
 import * as Diff from 'diff';
+import { Options } from "../types";
 
 interface ToolbarEditorProps {
   data: { selection: string, from: number, to: number }
   action: { name: string, prompt: string, icon: string },
+  options: Options,
+  signal: AbortSignal
 }
 
-
-export const ToolbarEditor = ({ data, action }: ToolbarEditorProps) => {
+export const ToolbarEditor = ({ data, action, signal, options }: ToolbarEditorProps) => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
   const [showDiff, setShowDiff] = useState(false);
   const [diffs, setDiffs] = useState<Diff.Change[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -29,9 +32,10 @@ export const ToolbarEditor = ({ data, action }: ToolbarEditorProps) => {
     setShowDiff(false);
     setContent("");
     setLoading(true);
-    const stream = getImprovement(data.selection, action.prompt);
+    const stream = getImprovement(data.selection, action.prompt, options, signal);
     for await (const chunk of stream) {
       setContent((prev) => prev + chunk.content);
+      textareaRef.current?.scrollTo(0, textareaRef.current.scrollHeight);
     }
     setLoading(false);
   }
@@ -92,7 +96,7 @@ export const ToolbarEditor = ({ data, action }: ToolbarEditorProps) => {
           }
         })}
       </div> :
-      <textarea disabled={loading} placeholder={"Generating..."} onChange={(e) => setContent((e.target as HTMLTextAreaElement).value)}>{content}</textarea>}
+      <textarea ref={textareaRef} disabled={loading} placeholder={"Generating..."} onChange={(e) => setContent((e.target as HTMLTextAreaElement).value)}>{content}</textarea>}
   </div >
 }
 
