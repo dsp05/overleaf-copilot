@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { Icon } from "./Icon";
 import "./styles/ToolbarEditor.css";
 import 'purecss/build/pure-min.css';
-import { getImprovement } from "../utils/improvement";
+import { getImprovementStream } from "../utils/improvement";
 import * as Diff from 'diff';
-import { Options } from "../types";
+import { EditorSelectionData, Options } from "../types";
 
 interface ToolbarEditorProps {
-  data: { selection: string, from: number, to: number }
+  data: EditorSelectionData,
   action: { name: string, prompt: string, icon: string },
   options: Options,
   signal: AbortSignal
@@ -32,7 +32,7 @@ export const ToolbarEditor = ({ data, action, signal, options }: ToolbarEditorPr
     setShowDiff(false);
     setContent("");
     setLoading(true);
-    const stream = getImprovement(data.selection, action.prompt, options, signal);
+    const stream = getImprovementStream(data.selection, action.prompt, options, signal);
     for await (const chunk of stream) {
       setContent((prev) => prev + chunk.content);
       textareaRef.current?.scrollTo(0, textareaRef.current.scrollHeight);

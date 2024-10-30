@@ -36,7 +36,7 @@ export async function getOptions() {
   if (!options.model && !!data[LOCAL_STORAGE_KEY_MODEL]) options.model = data[LOCAL_STORAGE_KEY_MODEL];
 
   // By default, always add a rewrite action in the toolbar.
-  if (toolbarActions.length === 0) toolbarActions.push({ name: '', prompt: '', icon: '' });
+  if (toolbarActions.length === 0) toolbarActions.push({ name: '', prompt: '', icon: '', onClick: 'show_editor' });
   options.toolbarActions = toolbarActions;
 
   return options;
