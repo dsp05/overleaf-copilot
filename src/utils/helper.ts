@@ -4,24 +4,23 @@ import { Options } from "../types";
 const Prefixes = ["```latex\n", "```latex", "```"];
 const Suffixes = ["\n```", "```"];
 
-export function postProcessResponse(response: string | null) {
-  if (!response) return '';
+export function postProcessToken(token: string | null) {
+  if (!token) return '';
 
-  let result = response.trim();
 
   for (const prefix of Prefixes) {
-    if (result.startsWith(prefix)) {
-      result = result.substring(prefix.length);
+    if (token.startsWith(prefix)) {
+      token = token.substring(prefix.length);
     }
   }
 
   for (const suffix of Suffixes) {
-    if (result.endsWith(suffix)) {
-      result = result.substring(0, result.length - suffix.length);
+    if (token.endsWith(suffix)) {
+      token = token.substring(0, token.length - suffix.length);
     }
   }
 
-  return result;
+  return token;
 }
 
 export async function getOptions() {

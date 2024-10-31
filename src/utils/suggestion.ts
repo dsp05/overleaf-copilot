@@ -5,7 +5,7 @@ import {
   DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
   DEFAULT_MODEL,
 } from '../constants';
-import { postProcessResponse } from './helper';
+import { postProcessToken } from './helper';
 import { Options, StreamChunk } from '../types';
 
 const HOSTED_COMPLETE_URL = 'https://embedding.azurewebsites.net/complete';
@@ -18,50 +18,69 @@ export async function* getSuggestion(input: string, signal: AbortSignal, options
       const response = await fetch(HOSTED_COMPLETE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: input }),
+        body: JSON.stringify({ content: input, stream: true }),
         signal: signal,
       });
 
-      yield { kind: "token", content: postProcessResponse((await response.json())["content"]) };
-      return;
+      if (!response.ok || response.body === null) {
+        yield {
+          kind: "error",
+          content: "Server is at capacity. Please try again later or use your own OpenAI API key."
+        };
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const token = postProcessToken(decoder.decode(value, { stream: true }));
+        if (!!token) {
+          yield {
+            kind: "token",
+            content: token,
+          };
+        }
+      }
     } catch (AbortError) {
-      return;
     }
-  };
+  } else {
+    const openai = new OpenAI({
+      apiKey: options.apiKey,
+      baseURL: options.apiBaseUrl,
+      dangerouslyAllowBrowser: true,
+    });
 
-  const openai = new OpenAI({
-    apiKey: options.apiKey,
-    baseURL: options.apiBaseUrl,
-    dangerouslyAllowBrowser: true,
-  });
+    try {
+      const stream = await openai.chat.completions.create(
+        {
+          messages: [
+            {
+              role: 'user',
+              content: buildSuggestionPrompt(
+                input,
+                options.suggestionPrompt,
+              ),
+            },
+          ],
+          model: options.model ?? DEFAULT_MODEL,
+          max_tokens: options.suggestionMaxOutputToken ?? DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
+          stream: true,
+        },
+        { signal: signal }
+      );
 
-  try {
-    const stream = await openai.chat.completions.create(
-      {
-        messages: [
-          {
-            role: 'user',
-            content: buildSuggestionPrompt(
-              input,
-              options.suggestionPrompt,
-            ),
-          },
-        ],
-        model: options.model ?? DEFAULT_MODEL,
-        max_tokens: options.suggestionMaxOutputToken ?? DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
-        stream: true,
-      },
-      { signal: signal }
-    );
-
-    for await (const chunk of stream) {
-      yield { kind: "token", content: chunk.choices[0]?.delta?.content || '' };
+      for await (const chunk of stream) {
+        yield { kind: "token", content: chunk.choices[0]?.delta?.content || '' };
+      }
+    } catch (error) {
+      if (error instanceof APIUserAbortError) {
+        return;
+      }
+      yield { kind: "error", content: "An error occurred while generating the content.\n" + error };
     }
-  } catch (error) {
-    if (error instanceof APIUserAbortError) {
-      return;
-    }
-    yield { kind: "error", content: "An error occurred while generating the content.\n" + error };
   }
 }
 
