@@ -4,7 +4,7 @@ import OpenAI, { APIUserAbortError } from 'openai';
 import {
   DEFAULT_MODEL,
 } from '../constants';
-import { postProcessResponse } from './helper';
+import { postProcessToken } from './helper';
 import { Options, StreamChunk } from '../types';
 
 const HOSTED_IMPROVE_URL = 'https://embedding.azurewebsites.net/improve';
@@ -21,7 +21,7 @@ export async function getImprovement(selection: string, prompt: string, options:
       if (!response.ok) {
         return "Server is at capacity. Please select fewer words, try again later or use your own OpenAI API key."
       }
-      return postProcessResponse((await response.json())["content"])
+      return postProcessToken((await response.json())["content"])
     } catch (AbortError) {
       return "The request was aborted.";
     }
@@ -60,11 +60,11 @@ export async function* getImprovementStream(selection: string, prompt: string, o
       const response = await fetch(HOSTED_IMPROVE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: selection }),
+        body: JSON.stringify({ content: selection, stream: true }),
         signal: signal,
       });
 
-      if (!response.ok) {
+      if (!response.ok || response.body === null) {
         yield {
           kind: "error",
           content: "Server is at capacity. Please select fewer words, try again later or use your own OpenAI API key."
@@ -72,12 +72,21 @@ export async function* getImprovementStream(selection: string, prompt: string, o
         return;
       }
 
-      yield {
-        kind: "token",
-        content: postProcessResponse((await response.json())["content"])
-      };
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const token = postProcessToken(decoder.decode(value, { stream: true }));
+        if (!!token) {
+          yield {
+            kind: "token",
+            content: token,
+          };
+        }
+      }
     } catch (AbortError) {
-      return;
     }
   } else {
     const openai = new OpenAI({
