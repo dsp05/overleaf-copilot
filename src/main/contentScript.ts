@@ -80,6 +80,8 @@ function onCursorUpdate() {
 
       if (newLine) {
         prefix.push('\n');
+      } else {
+        prefix.push(' ');
       }
 
       window.dispatchEvent(
