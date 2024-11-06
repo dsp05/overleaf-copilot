@@ -5,12 +5,12 @@ import {
   DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
   DEFAULT_MODEL,
 } from '../constants';
-import { postProcessToken } from './helper';
-import { Options, StreamChunk } from '../types';
+import { postProcessToken, renderPrompt } from './helper';
+import { Options, StreamChunk, TextContent } from '../types';
 
 const HOSTED_COMPLETE_URL = 'https://embedding.azurewebsites.net/complete';
 
-export async function* getSuggestion(input: string, signal: AbortSignal, options: Options):
+export async function* getSuggestion(content: TextContent, signal: AbortSignal, options: Options):
   AsyncGenerator<StreamChunk, void, unknown> {
 
   if (!options.apiKey) {
@@ -18,7 +18,7 @@ export async function* getSuggestion(input: string, signal: AbortSignal, options
       const response = await fetch(HOSTED_COMPLETE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: input, stream: true }),
+        body: JSON.stringify({ content: content.before, stream: true }),
         signal: signal,
       });
 
@@ -59,10 +59,7 @@ export async function* getSuggestion(input: string, signal: AbortSignal, options
           messages: [
             {
               role: 'user',
-              content: buildSuggestionPrompt(
-                input,
-                options.suggestionPrompt,
-              ),
+              content: buildSuggestionPrompt(content, options.suggestionPrompt),
             },
           ],
           model: options.model ?? DEFAULT_MODEL,
@@ -84,19 +81,19 @@ export async function* getSuggestion(input: string, signal: AbortSignal, options
   }
 }
 
-function buildSuggestionPrompt(input: string, template: string | undefined) {
+function buildSuggestionPrompt(content: TextContent, template: string | undefined) {
   if (!!template) {
     if (template.indexOf('<input>') >= 0)
-      return template.replace('<input>', input);
-    else return template + input;
+      return template.replace('<input>', content.before.slice(-1000));
+
+    return renderPrompt(template, content);
   }
 
   return (
-    `Continue ${input.endsWith('\n') ? '' : 'the last paragraph of '
-    }the academic paper in LaTeX below, ` +
+    `Continue ${content.before.endsWith('\n') ? '' : 'the last paragraph of '}the academic paper in LaTeX below, ` +
     `making sure to maintain semantic continuity.\n\n` +
     `### Beginning of the paper ###\n` +
-    `${input}\n` +
+    `${content.before.slice(-1000)}\n` +
     `### End of the paper ###`
   );
 }

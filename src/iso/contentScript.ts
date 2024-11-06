@@ -3,7 +3,7 @@
 import './contentScript.css';
 
 import { showToolbar } from './toolbar';
-import { Options } from '../types';
+import { Options, TextContent } from '../types';
 import { Suggestion } from '../common/suggestion';
 import { getOptions } from '../utils/helper';
 
@@ -13,10 +13,8 @@ let toolbarActionAbortController: AbortController | null = null;
 
 async function onEditorUpdate(
   event: CustomEvent<{
-    prefix: string,
-    pos: number,
-    row: number,
-    col: number
+    content: TextContent,
+    head: number,
   }>
 ) {
   suggestionAbortController?.abort();
@@ -27,7 +25,7 @@ async function onEditorUpdate(
   const existing = Suggestion.getCurrent();
   if (!!existing) return;
 
-  await Suggestion.create(event.detail.pos)?.generate(event.detail.prefix, suggestionAbortController.signal, options);
+  await Suggestion.create(event.detail.head)?.generate(event.detail.content, suggestionAbortController.signal, options);
 }
 
 async function onOptionsUpdate() {
@@ -39,7 +37,7 @@ async function onOptionsUpdate() {
 
 async function onEditorSelect(
   event: CustomEvent<{
-    selection: string;
+    content: TextContent;
     from: number;
     to: number;
     head: number;

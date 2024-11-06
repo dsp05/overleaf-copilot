@@ -90,12 +90,6 @@ const OptionsForm = () => {
               or use Ctrl/Command + right arrow to insert it word by word.</p>
           </div>
           <div class="pure-control-group">
-            <label for="field-suggestion-prompt-max-words">Prompt max words</label>
-            <input class="pure-input-1-4" type="number" id="field-suggestion-prompt-max-words" placeholder="500" value={state.suggestionPromptMaxWords}
-              onChange={(e) => onOptionsChange({ ...state, suggestionPromptMaxWords: parseInt(e.currentTarget.value) })} />
-            <span class="pure-form-message-inline pure-u-1-3">Set the maximum word count for suggestions. Default is 500.</span>
-          </div>
-          <div class="pure-control-group">
             <label for="field-suggestion-max-output-token">Max output token</label>
             <input class="pure-input-1-4" type="number" id="field-suggestion-max-output-token" placeholder="100" value={state.suggestionMaxOutputToken}
               onChange={(e) => onOptionsChange({ ...state, suggestionMaxOutputToken: parseInt(e.currentTarget.value) })} />
@@ -103,10 +97,18 @@ const OptionsForm = () => {
           </div>
           <div class="pure-control-group">
             <label for="field-suggestion-prompt">Prompt</label>
-            <textarea style="height: 9em" class="pure-input-1-4" id="field-suggestion-prompt" placeholder="Continue the academic paper in LaTeX below, making sure to maintain semantic continuity.&#10;&#10;### Beginning of the paper ###&#10;<input>&#10;### End of the paper ###" value={state.suggestionPrompt}
+            <textarea style="height: 9em" class="pure-input-1-4" id="field-suggestion-prompt"
+              placeholder="Continue the academic paper in LaTeX below, making sure to maintain semantic continuity.&#10;&#10;### Beginning of the paper ###&#10;{{before[-1000:]}}&#10;### End of the paper ###"
+              value={state.suggestionPrompt}
               onChange={(e) => onOptionsChange({ ...state, suggestionPrompt: e.currentTarget.value })} />
-            <span class="pure-form-message-inline pure-u-1-3">The prompt used to continue writing content. It must include the placeholder "&lt;input&gt;",
-              which will be replaced by the text before the cursor when generating content.</span>
+            <span class="pure-form-message-inline pure-u-1-3">
+              <span>
+                Available variables are:<br /><br />
+                <b>before</b>: Text before the cursor (max 5000 chars).<br />
+                <b>after</b>: Text after the cursor (max 5000 chars).<br /><br />
+                Add variables in the template using a Jinja like format, e.g. <code>&#123;&#123; before[-1000:] &#125;&#125;</code>.
+              </span>
+            </span>
           </div>
           <div class="pure-controls">
             <label for="field-suggestion-diabled" class="pure-checkbox">
@@ -162,15 +164,23 @@ const OptionsForm = () => {
                 </div>
                 <div class="pure-control-group">
                   <label for={"field-suggestion-prompt" + index}>Prompt</label>
-                  <textarea style="height: 9em" class="pure-input-1-4" id={"field-suggestion-prompt" + index} placeholder="Rewrite and improve the following content:&#10;<input>&#10;" value={action.prompt}
+                  <textarea style="height: 9em" class="pure-input-1-4" id={"field-suggestion-prompt" + index}
+                    placeholder="Rewrite and improve the following content:&#10;{{selection}}&#10;" value={action.prompt}
                     onChange={(e) => {
                       const toolbarActions = state.toolbarActions;
                       if (!toolbarActions) return;
                       toolbarActions[index].prompt = e.currentTarget.value;
                       onOptionsChange({ ...state, toolbarActions });
                     }} />
-                  <span class="pure-form-message-inline pure-u-1-3">This prompt is used to generate content based on the selected text.
-                    It must include the placeholder "&lt;input&gt;", which will be replaced by the selected text during content generation.</span>
+                  <span class="pure-form-message-inline pure-u-1-3">
+                    <span>
+                      Available variables are:<br /><br />
+                      <b>selection</b>: Selected content.<br />
+                      <b>before</b>: Text before the cursor (max 5000 chars).<br />
+                      <b>after</b>: Text after the cursor (max 5000 chars).<br /><br />
+                      Add variables in the template using a Jinja like format, e.g. <code>&#123;&#123; selection &#125;&#125;</code>.
+                    </span>
+                  </span>
                 </div>
               </Fragment>))
           }

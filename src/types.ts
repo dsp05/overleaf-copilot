@@ -2,28 +2,33 @@
 
 export interface EditorContent {
   cmView: {
-    view: {
-      state: {
-        doc: {
-          lineAt: (pos: number) => {
-            number: number;
-            from: number;
-            text: string;
-          };
-        };
-        selection: {
-          main: {
-            from: number;
-            to: number;
-            head: number;
-          };
-        };
-        sliceDoc: (from: number, to: number) => string;
-      };
-      dispatch: (changes: any) => void;
+    view: EditorContentView;
+  }
+}
+
+export interface EditorContentView {
+  state: EditorContentState,
+  dispatch: (changes: any) => void;
+};
+
+export interface EditorContentState {
+  doc: {
+    lineAt: (pos: number) => {
+      number: number;
+      from: number;
+      text: string;
+    };
+    length: number;
+  };
+  selection: {
+    main: {
+      from: number;
+      to: number;
+      head: number;
     };
   };
-}
+  sliceDoc: (from: number, to: number) => string;
+};
 
 export interface ToolbarAction {
   name: string,
@@ -37,7 +42,6 @@ export interface Options {
   apiBaseUrl?: string;
   model?: string;
 
-  suggestionPromptMaxWords?: number;
   suggestionMaxOutputToken?: number;
   suggestionPrompt?: string;
   suggestionDisabled?: boolean;
@@ -52,8 +56,14 @@ export interface StreamChunk {
 }
 
 export interface EditorSelectionData {
-  selection: string;
+  content: TextContent;
   from: number;
   to: number;
   head: number;
+}
+
+export interface TextContent {
+  before: string,
+  after: string,
+  selection: string,
 }

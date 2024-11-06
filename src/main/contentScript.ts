@@ -1,11 +1,8 @@
 'use strict';
 
-import { Options } from '../types';
-import { DEFAULT_SUGGESTION_MAX_WORDS } from '../constants';
-import { getCmView, updateSuggestionOnCursorUpdate } from './helpers';
+import { getContentBeforeCursor, getCmView, updateSuggestionOnCursorUpdate, getContentAfterCursor } from './helpers';
 import { onAcceptPartialSuggestion, onAcceptSuggestion, onReplaceContent } from './eventHandlers';
-
-let options: Options | undefined = undefined;
+import { MAX_LENGTH_AFTER_CURSOR, MAX_LENGTH_BEFORE_CURSOR, MAX_LENGTH_SELECTION } from '../constants';
 
 function debounce<T extends () => void>(func: T): () => void {
   let timeout: NodeJS.Timeout | null;
@@ -34,64 +31,44 @@ function onKeyDown(event: KeyboardEvent) {
 }
 
 function onCursorUpdate() {
-  if (options == undefined) return;
-
-  const maxPromptWords = options.suggestionPromptMaxWords || DEFAULT_SUGGESTION_MAX_WORDS;;
-
   var view = getCmView();
   const state = view.state;
+  const from = state.selection.main.from;
+  const to = state.selection.main.to;
+  const head = state.selection.main.head;
 
-  if (state.selection.main.from != state.selection.main.to) {
+  if (from != to) {
     // Selection is not empty. Show the toolbar;
-    if (state.selection.main.to - state.selection.main.from >= 5000) return;
+    if (to - from >= MAX_LENGTH_SELECTION) return;
     window.dispatchEvent(
       new CustomEvent('copilot:editor:select', {
         detail: {
-          selection: state.sliceDoc(
-            state.selection.main.from,
-            state.selection.main.to
-          ),
-          from: state.selection.main.from,
-          to: state.selection.main.to,
-          head: state.selection.main.head,
+          content: {
+            selection: state.sliceDoc(from, to),
+            before: getContentBeforeCursor(state, from, MAX_LENGTH_BEFORE_CURSOR),
+            after: getContentAfterCursor(state, to, MAX_LENGTH_AFTER_CURSOR),
+          },
+          from,
+          to,
+          head,
         },
       })
     );
   } else {
     // Selection is empty. Show the suggestion.
-    const pos = state.selection.main.head;
-    const line = state.doc.lineAt(pos);
-    const col = pos - line.from;
+    const line = state.doc.lineAt(head);
+    const col = head - line.from;
     const newLine = line.text.length == 0;
     if (newLine || (col == line.text.length && line.text[col - 1] == ' ')) {
-      let prefix = line.text.trim().split(' ');
-      let from = line.from;
-      while (prefix.length < maxPromptWords && from > 0) {
-        const prevLine = state.doc.lineAt(from - 1);
-        from = prevLine.from - 1;
-        const content = prevLine.text.trim().split(' ');
-        if (content.length == 0) continue;
-        prefix = content.concat(['\n']).concat(prefix);
-      }
-
-      if (prefix.length > maxPromptWords) {
-        prefix = prefix.slice(-maxPromptWords);
-      }
-
-      if (newLine) {
-        prefix.push('\n');
-      } else {
-        prefix.push(' ');
-      }
-
       window.dispatchEvent(
         new CustomEvent('copilot:editor:update', {
           detail: {
-            prefix: prefix.join(' '),
-            pos,
-            newLine,
-            col,
-            row: line.number - 1,
+            content: {
+              selction: '',
+              before: getContentBeforeCursor(state, head, MAX_LENGTH_BEFORE_CURSOR),
+              after: getContentAfterCursor(state, head, MAX_LENGTH_AFTER_CURSOR),
+            },
+            head,
           },
         })
       );
@@ -99,13 +76,9 @@ function onCursorUpdate() {
   }
 }
 
-function onOptionsUpdate(e: CustomEvent<{ options: Options }>) {
-  options = e.detail.options;
-}
 
 window.addEventListener('copilot:editor:replace', onReplaceContent as EventListener);
 window.addEventListener('cursor:editor:update', debounce(onCursorUpdate));
-window.addEventListener('copilot:options:update', onOptionsUpdate as EventListener);
 
 // REVIEW dsp05: This isn't very ideal, need to investigate what was changed.
 const setupKeydownListener = (n: number) => {
