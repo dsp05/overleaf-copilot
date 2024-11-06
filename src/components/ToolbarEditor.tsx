@@ -32,7 +32,7 @@ export const ToolbarEditor = ({ data, action, signal, options }: ToolbarEditorPr
     setShowDiff(false);
     setContent("");
     setLoading(true);
-    const stream = getImprovementStream(data.selection, action.prompt, options, signal);
+    const stream = getImprovementStream(data.content, action.prompt, options, signal);
     for await (const chunk of stream) {
       setContent((prev) => prev + chunk.content);
       textareaRef.current?.scrollTo(0, textareaRef.current.scrollHeight);
@@ -55,11 +55,11 @@ export const ToolbarEditor = ({ data, action, signal, options }: ToolbarEditorPr
 
   const onToggleDiff = () => {
     if (!showDiff) {
-      const charDiff = Diff.diffChars(data.selection, content);
+      const charDiff = Diff.diffChars(data.content.selection, content);
       if (charDiff.length <= 100) {
         setDiffs(charDiff);
       } else {
-        const wordDiffs = Diff.diffWordsWithSpace(data.selection, content);
+        const wordDiffs = Diff.diffWordsWithSpace(data.content.selection, content);
         setDiffs(wordDiffs);
       }
     }

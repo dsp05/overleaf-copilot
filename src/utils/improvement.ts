@@ -4,18 +4,18 @@ import OpenAI, { APIUserAbortError } from 'openai';
 import {
   DEFAULT_MODEL,
 } from '../constants';
-import { postProcessToken } from './helper';
-import { Options, StreamChunk } from '../types';
+import { postProcessToken, renderPrompt } from './helper';
+import { Options, TextContent, StreamChunk } from '../types';
 
 const HOSTED_IMPROVE_URL = 'https://embedding.azurewebsites.net/improve';
 
-export async function getImprovement(selection: string, prompt: string, options: Options, signal: AbortSignal) {
+export async function getImprovement(content: TextContent, prompt: string, options: Options, signal: AbortSignal) {
   if (!options.apiKey) {
     try {
       const response = await fetch(HOSTED_IMPROVE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: selection }),
+        body: JSON.stringify({ content: content.selection }),
         signal: signal,
       });
       if (!response.ok) {
@@ -37,7 +37,7 @@ export async function getImprovement(selection: string, prompt: string, options:
         messages: [
           {
             role: 'user',
-            content: buildImprovePrompt(selection, prompt),
+            content: buildImprovePrompt(content, prompt),
           },
         ],
         model: options.model || DEFAULT_MODEL,
@@ -52,7 +52,7 @@ export async function getImprovement(selection: string, prompt: string, options:
   }
 }
 
-export async function* getImprovementStream(selection: string, prompt: string, options: Options, signal: AbortSignal):
+export async function* getImprovementStream(content: TextContent, prompt: string, options: Options, signal: AbortSignal):
   AsyncGenerator<StreamChunk, void, unknown> {
 
   if (!options.apiKey) {
@@ -60,7 +60,7 @@ export async function* getImprovementStream(selection: string, prompt: string, o
       const response = await fetch(HOSTED_IMPROVE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: selection, stream: true }),
+        body: JSON.stringify({ content: content.selection, stream: true }),
         signal: signal,
       });
 
@@ -100,7 +100,7 @@ export async function* getImprovementStream(selection: string, prompt: string, o
         messages: [
           {
             role: 'user',
-            content: buildImprovePrompt(selection, prompt),
+            content: buildImprovePrompt(content, prompt),
           },
         ],
         model: options.model || DEFAULT_MODEL,
@@ -120,10 +120,13 @@ export async function* getImprovementStream(selection: string, prompt: string, o
   }
 }
 
-function buildImprovePrompt(selection: string, template: string) {
-  if (!!template && template.indexOf('<input>') >= 0) {
-    return template.replace('<input>', selection);
+function buildImprovePrompt(content: TextContent, template: string) {
+  if (!!template) {
+    if (template.indexOf('<input>') >= 0)
+      return template.replace('<input>', content.selection);
+
+    return renderPrompt(template, content);
   }
 
-  return `Rewrite and improve the following content:\n` + `${selection}`;
+  return `Rewrite and improve the following content:\n` + `${content.selection}`;
 }

@@ -64,7 +64,7 @@ export function showToolbar(data: EditorSelectionData, options: Options, signal:
       render(h(ToolbarEditor, { action, data, options, signal }), toolbarEditor);
     },
     onClickSearch: async () => {
-      await onFindSimilar(data.selection);
+      await onFindSimilar(data.content.selection);
     }
   }), toolbar);
 }

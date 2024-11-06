@@ -1,4 +1,4 @@
-import { EditorContent } from "../types";
+import { EditorContent, EditorContentState } from "../types";
 import { Suggestion } from "../common/suggestion";
 
 export function getCmView() {
@@ -18,4 +18,14 @@ export function updateSuggestionOnCursorUpdate() {
     return;
 
   suggestion.remove();
+}
+
+export function getContentBeforeCursor(state: EditorContentState, pos: number, length: number) {
+  const start = Math.max(0, pos - length);
+  return state.sliceDoc(start, pos);
+}
+
+export function getContentAfterCursor(state: EditorContentState, pos: number, length: number) {
+  const end = Math.min(state.doc.length, pos + length);
+  return state.sliceDoc(pos, end);
 }

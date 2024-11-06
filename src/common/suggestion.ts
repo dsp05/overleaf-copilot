@@ -1,4 +1,4 @@
-import { Options } from "../types";
+import { Options, TextContent } from "../types";
 import { getSuggestion } from "../utils/suggestion";
 
 // A class to represent a suggestion in the editor
@@ -74,7 +74,7 @@ export class Suggestion {
     (this.dom.firstChild! as HTMLDivElement).style.color = color
   }
 
-  public async generate(content: string, signal: AbortSignal, options: Options) {
+  public async generate(content: TextContent, signal: AbortSignal, options: Options) {
     let hasError = false;
     let firstToken = true;
     for await (const chunk of getSuggestion(content, signal, options)) {
