@@ -1,14 +1,18 @@
 import { render, Fragment } from 'preact';
 import { useEffect, useState } from 'preact/hooks'
 import 'purecss/build/pure-min.css';
-import { LOCAL_STORAGE_KEY_OPTIONS, MODELS } from '../constants';
+import { LOCAL_STORAGE_KEY_OPTIONS, MODELS, DEFAULT_MODEL } from '../constants';
 import { Options } from '../types';
 import { getOptions } from '../utils/helper';
 import { IconSelect } from './IconSelect';
+import OpenAI from 'openai';
 
 const OptionsForm = () => {
   const [state, setState] = useState<Options>({});
   const [message, setMessage] = useState<string>();
+  const [newModel, setNewModel] = useState<string>('');
+  const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
+  const [testMessage, setTestMessage] = useState<string>('');
 
   useEffect(() => {
     getOptions().then((options) => {
@@ -39,10 +43,87 @@ const OptionsForm = () => {
     window.close();
   }
 
+  const onAddCustomModel = () => {
+    if (!newModel.trim()) return;
+    const customModels = state.customModels ?? [];
+    if (customModels.includes(newModel) || MODELS.includes(newModel)) {
+      alert('Model already exists');
+      return;
+    }
+    customModels.push(newModel.trim());
+    onOptionsChange({ ...state, customModels });
+    setNewModel('');
+  };
+
+  const onDeleteCustomModel = (modelToDelete: string) => {
+    const customModels = state.customModels?.filter(m => m !== modelToDelete) ?? [];
+    // If the deleted model was selected, switch to default
+    const newState = { ...state, customModels };
+    if (state.model === modelToDelete) {
+      newState.model = MODELS[0];
+    }
+    onOptionsChange(newState);
+  };
+
   const onOptionsChange = (options: Options) => {
     setMessage('');
     setState(options);
   }
+
+  const onTestConnection = async () => {
+    if (!state.apiKey) {
+      setTestStatus('error');
+      setTestMessage('Please enter an API key first.');
+      return;
+    }
+
+    setTestStatus('testing');
+    setTestMessage('Testing connection...');
+
+    try {
+      const openai = new OpenAI({
+        apiKey: state.apiKey,
+        baseURL: state.apiBaseUrl || undefined,
+        dangerouslyAllowBrowser: true,
+      });
+
+      const modelToTest = state.model || DEFAULT_MODEL;
+
+      const response = await openai.chat.completions.create({
+        messages: [
+          {
+            role: 'user',
+            content: 'Hello, this is a test. Please respond with "OK".',
+          },
+        ],
+        model: modelToTest,
+        max_tokens: 10,
+      });
+
+      if (response.choices && response.choices.length > 0) {
+        setTestStatus('success');
+        setTestMessage(`✓ Connection successful! Model "${modelToTest}" is working.`);
+      } else {
+        setTestStatus('error');
+        setTestMessage('Connection failed: No response received.');
+      }
+    } catch (error: any) {
+      setTestStatus('error');
+      let errorMessage = 'Connection failed: ';
+      if (error.message) {
+        errorMessage += error.message;
+      } else if (error.status === 401) {
+        errorMessage += 'Invalid API key.';
+      } else if (error.status === 404) {
+        errorMessage += 'Model not found. Please check the model name.';
+      } else if (error.status === 429) {
+        errorMessage += 'Rate limit exceeded. Please try again later.';
+      } else {
+        errorMessage += String(error);
+      }
+      setTestMessage(errorMessage);
+    }
+  };
 
   const version = chrome.runtime.getManifest().version;
 
@@ -79,9 +160,57 @@ const OptionsForm = () => {
             <label for="field-model">Model</label>
             <select style="padding-top: 0px; padding-bottom: 0px" id="field-model" class="pure-input-1-4"
               onChange={(e) => onOptionsChange({ ...state, model: e.currentTarget.value })}>
-              {MODELS.map((model) => <option value={model} selected={model === state.model}>{model}</option>)}
+              <optgroup label="Default Models">
+                {MODELS.map((model) => <option value={model} selected={model === state.model}>{model}</option>)}
+              </optgroup>
+              {(state.customModels && state.customModels.length > 0) && (
+                <optgroup label="Custom Models">
+                  {state.customModels.map((model) => <option value={model} selected={model === state.model}>{model}</option>)}
+                </optgroup>
+              )}
             </select>
             <span class="pure-form-message-inline pure-u-1-3">Select the model you want to use.</span>
+          </div>
+
+          <div class="pure-control-group">
+            <label for="field-custom-models">Custom Models</label>
+            <div class="pure-input-1-2" style="display:inline-block" id="field-custom-models">
+              {state.customModels?.map((model) => (
+                <div style="margin-bottom: 5px; display: flex; align-items: center;">
+                  <span style="flex-grow: 1">{model}</span>
+                  <button type="button" class="pure-button" onClick={() => onDeleteCustomModel(model)}>-</button>
+                </div>
+              ))}
+              <div style="display: flex; margin-top: 5px;">
+                <input type="text" placeholder="New model name" value={newModel}
+                  onInput={(e) => setNewModel(e.currentTarget.value)}
+                  style="flex-grow: 1; margin-right: 5px;"
+                />
+                <button type="button" class="pure-button" onClick={onAddCustomModel}>+</button>
+              </div>
+            </div>
+            <span class="pure-form-message-inline pure-u-1-4">Add or remove custom models.</span>
+          </div>
+
+          <div class="pure-control-group">
+            <label>Test Connection</label>
+            <button
+              type="button"
+              class={`pure-button ${testStatus === 'testing' ? '' : 'pure-button-primary'}`}
+              onClick={onTestConnection}
+              disabled={testStatus === 'testing'}
+              style="margin-right: 10px"
+            >
+              {testStatus === 'testing' ? 'Testing...' : 'Test API Connection'}
+            </button>
+            {testMessage && (
+              <span
+                class="pure-form-message-inline"
+                style={`color: ${testStatus === 'success' ? '#2ecc40' : testStatus === 'error' ? '#ff4136' : '#333'}`}
+              >
+                {testMessage}
+              </span>
+            )}
           </div>
           <h2>Suggestion</h2>
           <div class="pure-u-3-4">

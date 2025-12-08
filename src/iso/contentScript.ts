@@ -20,6 +20,7 @@ async function onEditorUpdate(
   suggestionAbortController?.abort();
 
   if (options == undefined || options.suggestionDisabled) return;
+
   suggestionAbortController = new AbortController();
 
   const existing = Suggestion.getCurrent();
