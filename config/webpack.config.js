@@ -22,9 +22,6 @@ const config = (env, argv) =>
         https: false,
         url: false,
         timers: false,
-        string_decoder: false,
-        stream: false,
-        buffer: false,
       },
     },
   });
