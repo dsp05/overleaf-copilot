@@ -41,6 +41,7 @@ export interface Options {
   apiKey?: string;
   apiBaseUrl?: string;
   model?: string;
+  customModels?: string[];
 
   suggestionMaxOutputToken?: number;
   suggestionPrompt?: string;
