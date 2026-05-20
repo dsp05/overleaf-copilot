@@ -18,7 +18,8 @@
         "options.html"
       ],
       "matches": [
-        "https://www.overleaf.com/*"
+        "https://www.overleaf.com/*",
+        "https://www.*.overleaf.com/*"
       ]
     }
   ],
@@ -36,7 +37,8 @@
     {
       "world": "MAIN",
       "matches": [
-        "https://www.overleaf.com/project/*"
+        "https://www.overleaf.com/project/*",
+        "https://www.*.overleaf.com/project/*"
       ],
       "run_at": "document_idle",
       "js": [
@@ -45,7 +47,8 @@
     },
     {
       "matches": [
-        "https://www.overleaf.com/project/*"
+        "https://www.overleaf.com/project/*",
+        "https://www.*.overleaf.com/project/*"
       ],
       "run_at": "document_idle",
       "js": [
