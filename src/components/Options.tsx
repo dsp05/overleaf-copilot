@@ -77,11 +77,14 @@ const OptionsForm = () => {
           </div>
           <div class="pure-control-group">
             <label for="field-model">Model</label>
-            <select style="padding-top: 0px; padding-bottom: 0px" id="field-model" class="pure-input-1-4"
-              onChange={(e) => onOptionsChange({ ...state, model: e.currentTarget.value })}>
-              {MODELS.map((model) => <option value={model} selected={model === state.model}>{model}</option>)}
-            </select>
-            <span class="pure-form-message-inline pure-u-1-3">Select the model you want to use.</span>
+            <input type="text" list="model-list" id="field-model" class="pure-input-1-4"
+              placeholder="gpt-4o-mini"
+              value={state.model}
+              onChange={(e) => onOptionsChange({ ...state, model: e.currentTarget.value })} />
+            <datalist id="model-list">
+              {MODELS.map((model) => <option value={model} />)}
+            </datalist>
+            <span class="pure-form-message-inline pure-u-1-3">Select a model or type a custom model name.</span>
           </div>
           <h2>Suggestion</h2>
           <div class="pure-u-3-4">
