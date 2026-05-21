@@ -192,13 +192,6 @@ const OptionsForm = () => {
             <span class="pure-form-message-inline">Add a new custom action to the toolbar.</span>
           </div>
           <div class="pure-controls">
-            <label for="field-search-disabled" class="pure-checkbox">
-              <input type="checkbox" id="field-search-disabled" checked={state.toolbarSearchDisabled}
-                onChange={(e) => onOptionsChange({ ...state, toolbarSearchDisabled: e.currentTarget.checked })} /> Disable Search
-            </label>
-            <span class="pure-form-message-inline pure-u-1-3">Hide the search icon from the toolbar.</span>
-          </div>
-          <div class="pure-controls">
             <label for="field-toolbar-disabled" class="pure-checkbox">
               <input type="checkbox" id="field-toolbar-disabled" checked={state.toolbarDisabled}
                 onChange={(e) => onOptionsChange({ ...state, toolbarDisabled: e.currentTarget.checked })} /> Disable Toolbar

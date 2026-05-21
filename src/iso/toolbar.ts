@@ -36,7 +36,6 @@ export function showToolbar(data: EditorSelectionData, options: Options, signal:
     signal,
     data: data,
     actions: options.toolbarActions ?? [],
-    searchDisabled: !!options.toolbarSearchDisabled,
     onShowEditor: (action) => {
       const toolbar = document.getElementById('copilot-toolbar');
       if (toolbar == null)
@@ -63,9 +62,6 @@ export function showToolbar(data: EditorSelectionData, options: Options, signal:
       document.body.appendChild(toolbarEditor);
       render(h(ToolbarEditor, { action, data, options, signal }), toolbarEditor);
     },
-    onClickSearch: async () => {
-      await onFindSimilar(data.content.selection);
-    }
   }), toolbar);
 }
 

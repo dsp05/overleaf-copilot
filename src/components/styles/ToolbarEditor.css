@@ -47,7 +47,7 @@ div#copilot-toolbar-editor div.toolbar-editor-header a span {
   }
 
   &:last-child {
-    vertical-align: baseline;
+    vertical-align: middle;
     margin-left: 2px;
   }
 }
