@@ -54,7 +54,7 @@ export async function* getSuggestion(content: TextContent, signal: AbortSignal, 
     });
 
     try {
-      const stream = await openai.chat.completions.create(
+      const stream: any = await openai.chat.completions.create(
         {
           messages: [
             {
@@ -63,9 +63,9 @@ export async function* getSuggestion(content: TextContent, signal: AbortSignal, 
             },
           ],
           model: options.model ?? DEFAULT_MODEL,
-          max_tokens: options.suggestionMaxOutputToken ?? DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
+          max_completion_tokens: options.suggestionMaxOutputToken ?? DEFAULT_SUGGESTION_MAX_OUTPUT_TOKEN,
           stream: true,
-        },
+        } as any,
         { signal: signal }
       );
 
