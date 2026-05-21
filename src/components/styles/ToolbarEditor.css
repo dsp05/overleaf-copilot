@@ -43,11 +43,11 @@ div#copilot-toolbar-editor div.toolbar-editor-header .toolbar-editor-action {
 
 div#copilot-toolbar-editor div.toolbar-editor-header a span {
   &:first-child {
-    vertical-align: middle;
+    vertical-align: baseline;
   }
 
   &:last-child {
-    vertical-align: baseline;
+    vertical-align: middle;
     margin-left: 2px;
   }
 }

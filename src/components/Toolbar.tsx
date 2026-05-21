@@ -8,14 +8,12 @@ import "./styles/Toolbar.css";
 export interface ToolbarProps {
   data: EditorSelectionData;
   actions: ToolbarAction[];
-  searchDisabled: boolean;
   onShowEditor: (action: { name: string, prompt: string, icon: string }) => void;
-  onClickSearch: () => void;
   signal: AbortSignal;
   options: Options;
 }
 
-export const Toolbar = ({ data, actions, searchDisabled, onShowEditor, onClickSearch, signal, options }: ToolbarProps) => {
+export const Toolbar = ({ data, actions, onShowEditor, signal, options }: ToolbarProps) => {
   const [loading, setLoading] = useState(false);
 
   const onClick = async (action: ToolbarAction) => {
@@ -48,8 +46,5 @@ export const Toolbar = ({ data, actions, searchDisabled, onShowEditor, onClickSe
         <Icon name={action.icon} size={16} />
       </div>
     })}
-    {!searchDisabled && <div className="copilot-toolbar-button copilot-toolbar-search" title="Search" onClick={onClickSearch}>
-      <Icon name="search" size={16} />
-    </div>}
   </Fragment>
 }

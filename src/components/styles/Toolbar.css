@@ -16,7 +16,10 @@ div#copilot-toolbar div.copilot-toolbar-button {
   cursor: pointer;
   background-color: rgb(7, 109, 53);
   margin-left: 2px;
-  padding: 2px 5px 5px 5px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: white;
 
   &:hover {
@@ -28,13 +31,5 @@ div#copilot-toolbar div.copilot-toolbar-button {
     background-color: #999;
     filter: none;
     cursor: not-allowed;
-  }
-}
-
-div#copilot-toolbar div.copilot-toolbar-search {
-  background-color: #3265b2;
-
-  &:hover {
-    background-color: #295392;
   }
 }
